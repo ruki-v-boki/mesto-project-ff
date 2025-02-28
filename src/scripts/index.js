@@ -1,4 +1,5 @@
-'use strict'
+import {initialCards} from './cards'
+import '../pages/index.css'
 
 const placesList = document.querySelector('.places__list')
 const deleteCard = card => card.remove()
