@@ -1,6 +1,6 @@
 import '../pages/index.css'
-import { initialCards, createCard, deleteCard } from './cards.js'
-import { openModal, closeModal } from './modal.js'
+import { initialCards, createCard, deleteCard} from './cards.js'
+import { openModal, closeModal, closeModalByOverlay, closeModalByKey } from './modal.js'
 
 // профиль
 const profile = document.querySelector('.profile')
@@ -11,13 +11,29 @@ const profileJob = profile.querySelector('.profile__description').textContent
 const profileEditBtn = profile.querySelector('.profile__edit-button')
 const profileAddBtn = profile.querySelector('.profile__add-button')
 
+// слушатели кнопок
+profileEditBtn.addEventListener('click', () => openModal(profileEditModal))
+profileAddBtn.addEventListener('click', () => openModal(addNewCardModal))
+
 // модальные окна профиля
 const profileEditModal = document.querySelector('.popup_type_edit')
 const addNewCardModal = document.querySelector('.popup_type_new-card')
 
-// слушатели кнопок
-profileEditBtn.addEventListener('click', () => openModal(profileEditModal))
-profileAddBtn.addEventListener('click', () => openModal(addNewCardModal))
+// все модальные окна
+const popups = document.querySelectorAll('.popup')
+
+    popups.forEach((popup) => {
+        popup.addEventListener('click', closeModalByOverlay)
+        document.addEventListener('keydown', closeModalByKey)
+    })
+
+//все кнопки закрытия модальных окон
+const closeModalButtons = document.querySelectorAll('.popup__close')
+
+    closeModalButtons.forEach((button) => {
+        const modal = button.closest('.popup')
+        button.addEventListener('click', () => closeModal(modal))
+    })
 
 // контейнер карточек на странице
 const placesList = document.querySelector('.places__list')
