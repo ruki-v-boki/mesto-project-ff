@@ -17,8 +17,8 @@ function createCard(cardData, deleteCard, openModal, toggleLike) {
   cardImage.alt = cardData.name
   cardTitle.textContent = cardData.name
 
-  cardDeleteButton.addEventListener('click', () => deleteCard(card))
-  cardLikeButton.addEventListener('click', () => toggleLike(cardLikeButton))
+  cardDeleteButton.addEventListener('click', deleteCard)
+  cardLikeButton.addEventListener('click', toggleLike)
 
   cardImage.addEventListener('click', () => {
       openModal(cardImagePopup)
@@ -30,8 +30,16 @@ function createCard(cardData, deleteCard, openModal, toggleLike) {
     return card
 }
 
-// удалить карточку
-const deleteCard = card => card.remove()
+// функции-обработчик события удаления карточки
+const deleteCard = evt => {
+  if (evt.target === evt.currentTarget) {
+    evt.currentTarget.closest('.card').remove()
+  }
+}
 
-// добавить/удалить лайк
-const toggleLike = button => button.classList.toggle('card__like-button_is-active')
+// // функции-обработчик события переключения лайка карточки
+const toggleLike = evt => {
+  if (evt.target === evt.currentTarget) {
+    evt.currentTarget.classList.toggle('card__like-button_is-active')
+  }
+}
