@@ -1,12 +1,17 @@
 export { openModal, closeModal, closeModalByOverlay, closeModalByKey }
 
 // функция открытия модального окна
-const openModal = (modal, nameInput, nameOutput, jobInput, jobOutput) => {
+const openModal = (modal, nameInput, jobInput, nameOutput, jobOutput) => {
     modal.classList.add('popup_is-opened')
-
+    modal.style.cursor = 'pointer'
+    
     if (modal.classList.contains('popup_type_edit')) {
         nameInput.value = nameOutput.textContent
         jobInput.value = jobOutput.textContent
+    }
+    if (modal.classList.contains('popup_type_new-card')) {
+        nameInput.value = ''
+        jobInput.value = ''
     }
 }
 
