@@ -1,7 +1,7 @@
-export { createCard, deleteCard, toggleLike }
+export { createCard, deleteCard, switchTheLikeBtn }
 
 // Функция создания карточки
-function createCard(cardData, deleteCard, toggleLike) {
+function createCard(cardData, deleteCard, switchTheLikeBtn) {
     const cardTemplate = document.querySelector('#card-template').content
     const card = cardTemplate.querySelector('.card').cloneNode(true)
     const cardImage = card.querySelector('.card__image')
@@ -15,7 +15,7 @@ function createCard(cardData, deleteCard, toggleLike) {
     cardTitle.textContent = cardData.name
 
     cardDeleteButton.addEventListener('click', deleteCard)
-    cardLikeButton.addEventListener('click', toggleLike)
+    cardLikeButton.addEventListener('click', switchTheLikeBtn)
 
     return card
 }
@@ -28,7 +28,7 @@ const deleteCard = evt => {
 }
 
 // Функции-обработчик события переключения лайка карточки
-const toggleLike = evt => {
+const switchTheLikeBtn = evt => {
     if (evt.target === evt.currentTarget) {
         evt.currentTarget.classList.toggle('card__like-button_is-active')
     }

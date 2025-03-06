@@ -1,6 +1,6 @@
 import '../pages/index.css'
 import { initialCards } from '../components/cards.js'
-import { createCard, deleteCard, toggleLike } from '../components/card.js'
+import { createCard, deleteCard, switchTheLikeBtn } from '../components/card.js'
 import { openModal, closeModal } from '../components/modal.js'
 
 // Контейнер карточек на странице
@@ -8,18 +8,18 @@ const placesList = document.querySelector('.places__list')
 
 // Профиль
 const profile = document.querySelector('.profile')
-const profileName = profile.querySelector('.profile__title')// Имя пользвателя
-const profileJob = profile.querySelector('.profile__description')// Профессия пользователя
+const profileName = profile.querySelector('.profile__title')
+const profileJob = profile.querySelector('.profile__description')
 
 // Кнопки профиля
-const profileEditBtn = profile.querySelector('.profile__edit-button')// "Редактировать профиль"
-const profileAddBtn = profile.querySelector('.profile__add-button')// "+" Добавить новую карточку
+const profileEditBtn = profile.querySelector('.profile__edit-button')
+const profileAddBtn = profile.querySelector('.profile__add-button')
 
 
 //-------------- МОДАЛЬНЫЕ ОКНА --------------
 // Модальные окна профиля
-const profileEditModal = document.querySelector('.popup_type_edit')// "Редактировать профиль"
-const addNewCardModal = document.querySelector('.popup_type_new-card')// "+" Добавить новую карточку
+const profileEditModal = document.querySelector('.popup_type_edit')
+const addNewCardModal = document.querySelector('.popup_type_new-card')
 
 // Все модальные окна
 const modals = document.querySelectorAll('.popup')
@@ -29,7 +29,7 @@ const closeModalButtons = document.querySelectorAll('.popup__close')
 
 
 //------------------- ФОРМЫ -------------------
-//форма редактирования профиля
+// Форма редактирования профиля
 const profileEditForm = document.forms['edit-profile']
 const profileNameInput = profileEditForm.querySelector('.popup__input_type_name')
 const profileJobInput = profileEditForm.querySelector('.popup__input_type_description')
@@ -47,7 +47,7 @@ function handleFormSubmit(evt) {
     if (profileNameInput.value.trim() && (profileJobInput.value.trim() !== '')) {
         profileName.textContent = profileNameInput.value
         profileJob.textContent = profileJobInput.value
-    
+
         closeModal(profileEditModal)
     } else
       alert('Пожалуйста, заполните все поля. Поле не может быть пустым или содержать одни пробелы')
@@ -62,7 +62,7 @@ function handleNewCardFormSubmit(evt) {
             link: `${newCardLinkInput.value}`
         }
         initialCards.push(newCard)
-        placesList.prepend(createCard(newCard, deleteCard, toggleLike))
+        placesList.prepend(createCard(newCard, deleteCard, switchTheLikeBtn))
 
         addNewCardForm.reset()
         closeModal(addNewCardModal)
@@ -93,9 +93,9 @@ profileEditForm.addEventListener('submit', handleFormSubmit)
 addNewCardForm.addEventListener('submit', handleNewCardFormSubmit)
 
 // Все кнопки закрытия модальных окон
-closeModalButtons.forEach((button) => {
-    const modal = button.closest('.popup')
-    button.addEventListener('click', () => closeModal(modal))
+closeModalButtons.forEach((btn) => {
+    const modal = btn.closest('.popup')
+    btn.addEventListener('click', () => closeModal(modal))
 })
 
 // Кнопка, открывающая попап при клике по изображению карточки
@@ -122,4 +122,4 @@ placesList.addEventListener('click', (evt) => {
 modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
 // Вывод карточек на страницу
-initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, toggleLike)))
+initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, switchTheLikeBtn)))
