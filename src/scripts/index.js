@@ -1,7 +1,7 @@
 import '../pages/index.css'
 import { initialCards } from '../components/cards.js'
 import { createCard, deleteCard, toggleLike } from '../components/card.js'
-import { openModal, closeModal, closeModalByOverlay } from '../components/modal.js'
+import { openModal, closeModal } from '../components/modal.js'
 
 // Контейнер карточек на странице
 const placesList = document.querySelector('.places__list')
@@ -62,7 +62,7 @@ function handleNewCardFormSubmit(evt) {
             link: `${newCardLinkInput.value}`
         }
         initialCards.push(newCard)
-        placesList.prepend(createCard(newCard, deleteCard, openModal, toggleLike))
+        placesList.prepend(createCard(newCard, deleteCard, toggleLike))
 
         addNewCardForm.reset()
         closeModal(addNewCardModal)
@@ -122,4 +122,4 @@ placesList.addEventListener('click', (evt) => {
 modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
 // Вывод карточек на страницу
-initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, openModal, toggleLike)))
+initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, toggleLike)))
