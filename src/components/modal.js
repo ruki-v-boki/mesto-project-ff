@@ -17,8 +17,7 @@ const closeModal = modal => {
 // Функция-обработчик события клика по оверлею
 function closeModalByOverlayClick(evt) {
     if (evt.target === evt.currentTarget) {
-        evt.currentTarget.classList.remove('popup_is-opened')
-        document.removeEventListener('keydown', closeModalByKey)
+        closeModal(evt.currentTarget)
     }
 }
 
@@ -26,6 +25,6 @@ function closeModalByOverlayClick(evt) {
 function closeModalByKey(evt) {
     if (evt.key === 'Escape') {
         const modal = document.querySelector('.popup_is-opened')
-        modal ? modal.classList.remove('popup_is-opened') : false
+        modal ? closeModal(modal) : false
     }
 }

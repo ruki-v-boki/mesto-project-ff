@@ -42,7 +42,7 @@ const newCardLinkInput = addNewCardForm.querySelector('.popup__input_type_url')
 
 //------------------- ФУНКЦИИ -------------------
 // Отправка формы редактирования профиля
-function handleFormSubmit(evt) {
+function handleProfileFormSubmit(evt) {
     evt.preventDefault()
     if (profileNameInput.value.trim() && (profileJobInput.value.trim() !== '')) {
         profileName.textContent = profileNameInput.value
@@ -62,7 +62,7 @@ function handleNewCardFormSubmit(evt) {
             link: `${newCardLinkInput.value}`
         }
         initialCards.push(newCard)
-        placesList.prepend(createCard(newCard, deleteCard, switchTheLikeBtn))
+        placesList.prepend(createCard(newCard, deleteCard, switchTheLikeBtn, openModal))
 
         addNewCardForm.reset()
         closeModal(addNewCardModal)
@@ -87,7 +87,7 @@ profileAddBtn.addEventListener('click', () => {
 })
 
 // Кнопка "Сохранить" формы редактирования профиля
-profileEditForm.addEventListener('submit', handleFormSubmit)
+profileEditForm.addEventListener('submit', handleProfileFormSubmit)
 
 // Кнопка "Сохранить" формы создания новой карточки
 addNewCardForm.addEventListener('submit', handleNewCardFormSubmit)
@@ -97,29 +97,10 @@ closeModalButtons.forEach((btn) => {
     const modal = btn.closest('.popup')
     btn.addEventListener('click', () => closeModal(modal))
 })
-
-// Кнопка, открывающая попап при клике по изображению карточки
-placesList.addEventListener('click', (evt) => {
-    if (evt.target.classList.contains('card__image')) {
-        const cardImage = evt.target
-        const card = cardImage.closest('.card')
-        const cardTitle = card.querySelector('.card__title')
-
-        const cardImagePopup = document.querySelector('.popup_type_image')
-        const popupImage = cardImagePopup.querySelector('.popup__image')
-        const popupCaption = cardImagePopup.querySelector('.popup__caption')
-
-        popupImage.src = cardImage.src
-        popupImage.alt = cardImage.alt
-        popupCaption.textContent = cardTitle.textContent
-
-        openModal(cardImagePopup)
-    }
-})
 //-----------------------------------------------
 
 // Плавное открытие/закрытие всех модальных окон
 modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
 // Вывод карточек на страницу
-initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, switchTheLikeBtn)))
+initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, switchTheLikeBtn, openModal)))
