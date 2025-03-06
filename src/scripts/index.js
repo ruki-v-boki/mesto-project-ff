@@ -97,9 +97,28 @@ closeModalButtons.forEach((button) => {
     const modal = button.closest('.popup')
     button.addEventListener('click', () => closeModal(modal))
 })
-//---------------------------------------------
 
-// Все модальные окна
+// Кнопка, открывающая попап при клике по изображению карточки
+placesList.addEventListener('click', (evt) => {
+    if (evt.target.classList.contains('card__image')) {
+        const cardImage = evt.target
+        const card = cardImage.closest('.card')
+        const cardTitle = card.querySelector('.card__title')
+
+        const cardImagePopup = document.querySelector('.popup_type_image')
+        const popupImage = cardImagePopup.querySelector('.popup__image')
+        const popupCaption = cardImagePopup.querySelector('.popup__caption')
+
+        popupImage.src = cardImage.src
+        popupImage.alt = cardImage.alt
+        popupCaption.textContent = cardTitle.textContent
+
+        openModal(cardImagePopup)
+    }
+})
+//-----------------------------------------------
+
+// Плавное открытие/закрытие всех модальных окон
 modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
 // Вывод карточек на страницу
