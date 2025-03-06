@@ -1,37 +1,47 @@
 import '../pages/index.css'
 import { initialCards } from '../components/cards.js'
 import { createCard, deleteCard, toggleLike } from '../components/card.js'
-import { openModal, closeModal, closeModalByOverlay, closeModalByKey } from '../components/modal.js'
+import { openModal, closeModal, closeModalByOverlay } from '../components/modal.js'
 
-// профиль
+// Контейнер карточек на странице
+const placesList = document.querySelector('.places__list')
+
+// Профиль
 const profile = document.querySelector('.profile')
-const profileName = profile.querySelector('.profile__title')
-const profileJob = profile.querySelector('.profile__description')
+const profileName = profile.querySelector('.profile__title')// Имя пользвателя
+const profileJob = profile.querySelector('.profile__description')// Профессия пользователя
+
+// Кнопки профиля
+const profileEditBtn = profile.querySelector('.profile__edit-button')// "Редактировать профиль"
+const profileAddBtn = profile.querySelector('.profile__add-button')// "+" Добавить новую карточку
 
 
-// кнопки профиля
-const profileEditBtn = profile.querySelector('.profile__edit-button')
-const profileAddBtn = profile.querySelector('.profile__add-button')
+//-------------- МОДАЛЬНЫЕ ОКНА --------------
+// Модальные окна профиля
+const profileEditModal = document.querySelector('.popup_type_edit')// "Редактировать профиль"
+const addNewCardModal = document.querySelector('.popup_type_new-card')// "+" Добавить новую карточку
+
+// Все модальные окна
+const modals = document.querySelectorAll('.popup')
+
+// Все кнопки закрытия модальных окон
+const closeModalButtons = document.querySelectorAll('.popup__close')
 
 
-// слушатели кнопок профиля
-profileEditBtn.addEventListener('click', () => {
-    openModal(profileEditModal, profileNameInput, profileJobInput, profileName, profileJob)
-})
-
-profileAddBtn.addEventListener('click', () => openModal(addNewCardModal, newCardNameInput, newCardLinkInput))
-
-
-// модальные окна профиля
-const profileEditModal = document.querySelector('.popup_type_edit')
-const addNewCardModal = document.querySelector('.popup_type_new-card')
-
+//------------------- ФОРМЫ -------------------
 //форма редактирования профиля
 const profileEditForm = document.forms['edit-profile']
 const profileNameInput = profileEditForm.querySelector('.popup__input_type_name')
 const profileJobInput = profileEditForm.querySelector('.popup__input_type_description')
 
-//отправка формы редактирования профиля
+// Форма создания новой карточки
+const addNewCardForm = document.forms['new-place']
+const newCardNameInput = addNewCardForm.querySelector('.popup__input_type_card-name')
+const newCardLinkInput = addNewCardForm.querySelector('.popup__input_type_url')
+
+
+//------------------- ФУНКЦИИ -------------------
+// Отправка формы редактирования профиля
 function handleFormSubmit(evt) {
     evt.preventDefault()
     if (profileNameInput.value.trim() && (profileJobInput.value.trim() !== '')) {
@@ -43,15 +53,7 @@ function handleFormSubmit(evt) {
       alert('Пожалуйста, заполните все поля. Поле не может быть пустым или содержать одни пробелы')
 }
 
-profileEditForm.addEventListener('submit', handleFormSubmit)
-
-
-//форма создания новой карточки
-const addNewCardForm = document.forms['new-place']
-const newCardNameInput = addNewCardForm.querySelector('.popup__input_type_card-name')
-const newCardLinkInput = addNewCardForm.querySelector('.popup__input_type_url')
-
-//отправка формы создания новой карточки
+// Отправка формы создания новой карточки
 function handleNewCardFormSubmit(evt) {
     evt.preventDefault()
     if (newCardNameInput.value.trim() !== '') {
@@ -68,33 +70,37 @@ function handleNewCardFormSubmit(evt) {
       alert('Пожалуйста, заполните все поля. Поле не может быть пустым или содержать одни пробелы')
 }
 
+
+//------------------- КНОПКИ -------------------
+// Кнопка "Редактировать профиль"
+profileEditBtn.addEventListener('click', () => {
+    profileNameInput.value = profileName.textContent
+    profileJobInput.value = profileJob.textContent
+    openModal(profileEditModal)
+})
+
+// Кнопка "+" добавить новую карточку
+profileAddBtn.addEventListener('click', () => {
+    newCardNameInput.value = ''
+    newCardLinkInput.value = ''
+    openModal(addNewCardModal)
+})
+
+// Кнопка "Сохранить" формы редактирования профиля
+profileEditForm.addEventListener('submit', handleFormSubmit)
+
+// Кнопка "Сохранить" формы создания новой карточки
 addNewCardForm.addEventListener('submit', handleNewCardFormSubmit)
 
-
-// все модальные окна
-const modals = document.querySelectorAll('.popup')
-
-modals.forEach((modal) => {
-    modal.addEventListener('click', closeModalByOverlay)
-    document.addEventListener('keydown', closeModalByKey)
-    modal.classList.add('popup_is-animated')
-})
-
-
-//все кнопки закрытия модальных окон
-const closeModalButtons = document.querySelectorAll('.popup__close')
-
+// Все кнопки закрытия модальных окон
 closeModalButtons.forEach((button) => {
     const modal = button.closest('.popup')
-    button.addEventListener('click', () => {
-        closeModal(modal)
-    })
+    button.addEventListener('click', () => closeModal(modal))
 })
+//---------------------------------------------
 
+// Все модальные окна
+modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
-// контейнер карточек на странице
-const placesList = document.querySelector('.places__list')
-
-
-// вывод карточек на страницу
+// Вывод карточек на страницу
 initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, openModal, toggleLike)))

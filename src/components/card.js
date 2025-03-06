@@ -27,7 +27,7 @@ function createCard(cardData, deleteCard, openModal, toggleLike) {
         popupCaption.textContent = cardData.name
     })
 
-    return card
+  return card
 }
 
 // функции-обработчик события удаления карточки

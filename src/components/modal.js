@@ -1,31 +1,28 @@
-export { openModal, closeModal, closeModalByOverlay, closeModalByKey }
+export { openModal, closeModal }
 
-// функция открытия модального окна
-const openModal = (modal, nameInput, jobInput, nameOutput, jobOutput) => {
+// Функция открытия модального окна
+const openModal = modal => {
     modal.classList.add('popup_is-opened')
-    modal.style.cursor = 'pointer'
-
-    if (modal.classList.contains('popup_type_edit')) {
-        nameInput.value = nameOutput.textContent
-        jobInput.value = jobOutput.textContent
-    }
-    if (modal.classList.contains('popup_type_new-card')) {
-        nameInput.value = ''
-        jobInput.value = ''
-    }
+    modal.addEventListener('click', closeModalByOverlay)
+    document.addEventListener('keydown', closeModalByKey)
 }
 
-// функция закрытия модального окна
-const closeModal = modal => modal.classList.remove('popup_is-opened')
+// Функция закрытия модального окна
+const closeModal = modal => {
+    modal.classList.remove('popup_is-opened')
+    modal.removeEventListener('click', closeModalByOverlay)
+    document.removeEventListener('keydown', closeModalByKey)
+}
 
-// функция-обработчик события клика по оверлею
+// Функция-обработчик события клика по оверлею
 function closeModalByOverlay(evt) {
     if (evt.target === evt.currentTarget) {
         evt.currentTarget.classList.remove('popup_is-opened')
+        document.removeEventListener('keydown', closeModalByKey)
     }
 }
 
-// функция-обработчик события нажатия Esc
+// Функция-обработчик события нажатия кнопки "Esc"
 function closeModalByKey(evt) {
     if (evt.key === 'Escape') {
         const modal = document.querySelector('.popup_is-opened')
