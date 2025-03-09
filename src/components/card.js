@@ -1,7 +1,7 @@
 export { createCard, deleteCard, switchTheLikeBtn }
 
 // Функция создания карточки
-function createCard(cardData, deleteCard, switchTheLikeBtn, openModal) {
+function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal) {
     const cardTemplate = document.querySelector('#card-template').content
     const card = cardTemplate.querySelector('.card').cloneNode(true)
     const cardImage = card.querySelector('.card__image')
@@ -10,23 +10,16 @@ function createCard(cardData, deleteCard, switchTheLikeBtn, openModal) {
     const cardDeleteButton = card.querySelector('.card__delete-button')
     const cardLikeButton = card.querySelector('.card__like-button')
 
-    const cardImagePopup = document.querySelector('.popup_type_image')
-    const popupImage = cardImagePopup.querySelector('.popup__image')
-    const popupCaption = cardImagePopup.querySelector('.popup__caption')
+    const cardImageName = cardData.name
+    const cardImageLink = cardData.link
 
-    cardImage.src = cardData.link
-    cardImage.alt = cardData.name
-    cardTitle.textContent = cardData.name
+    cardImage.src = cardImageLink
+    cardImage.alt = cardImageName
+    cardTitle.textContent = cardImageName
 
     cardDeleteButton.addEventListener('click', deleteCard)
     cardLikeButton.addEventListener('click', switchTheLikeBtn)
-
-    cardImage.addEventListener('click', () => {
-        openModal(cardImagePopup)
-            popupImage.src = cardData.link
-            popupImage.alt = cardData.name
-            popupCaption.textContent = cardData.name
-        })
+    cardImage.addEventListener('click', () => openImgModal(cardImageName, cardImageLink))
 
     return card
 }

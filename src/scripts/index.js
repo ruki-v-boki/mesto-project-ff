@@ -17,9 +17,14 @@ const profileAddBtn = profile.querySelector('.profile__add-button')
 
 
 //-------------- МОДАЛЬНЫЕ ОКНА --------------
-// Модальные окна профиля
+// Модальне окна профиля
 const profileEditModal = document.querySelector('.popup_type_edit')
 const addNewCardModal = document.querySelector('.popup_type_new-card')
+
+//Модальное окно изображения карточки
+const cardImagePopup = document.querySelector('.popup_type_image')
+const popupImage = cardImagePopup.querySelector('.popup__image')
+const popupCaption = cardImagePopup.querySelector('.popup__caption')
 
 // Все модальные окна
 const modals = document.querySelectorAll('.popup')
@@ -62,12 +67,20 @@ function handleNewCardFormSubmit(evt) {
             link: `${newCardLinkInput.value}`
         }
         initialCards.push(newCard)
-        placesList.prepend(createCard(newCard, deleteCard, switchTheLikeBtn, openModal))
+        placesList.prepend(createCard(newCard, deleteCard, switchTheLikeBtn, openImgModal))
 
         addNewCardForm.reset()
         closeModal(addNewCardModal)
     } else
       alert('Пожалуйста, заполните все поля. Поле не может быть пустым или содержать одни пробелы')
+}
+
+//Функция открытия модального окна изображения карточки
+function openImgModal(name, link) {
+  openModal(cardImagePopup)
+  popupImage.alt = name
+  popupCaption.textContent = name
+  popupImage.src = link
 }
 
 
@@ -103,4 +116,4 @@ closeModalButtons.forEach((btn) => {
 modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
 // Вывод карточек на страницу
-initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, switchTheLikeBtn, openModal)))
+initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal)))
