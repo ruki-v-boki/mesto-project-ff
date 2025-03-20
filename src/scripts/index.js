@@ -2,6 +2,7 @@ import '../pages/index.css'
 import { initialCards } from '../components/cards.js'
 import { createCard, deleteCard, switchTheLikeBtn } from '../components/card.js'
 import { openModal, closeModal } from '../components/modal.js'
+import { enableValidation, clearValidation } from '../components/validation.js'
 
 // Контейнер карточек на странице
 const placesList = document.querySelector('.places__list')
@@ -21,7 +22,7 @@ const profileAddBtn = profile.querySelector('.profile__add-button')
 const profileEditModal = document.querySelector('.popup_type_edit')
 const addNewCardModal = document.querySelector('.popup_type_new-card')
 
-//Модальное окно изображения карточки
+// Модальное окно изображения карточки
 const cardImagePopup = document.querySelector('.popup_type_image')
 const popupImage = cardImagePopup.querySelector('.popup__image')
 const popupCaption = cardImagePopup.querySelector('.popup__caption')
@@ -44,18 +45,24 @@ const addNewCardForm = document.forms['new-place']
 const newCardNameInput = addNewCardForm.querySelector('.popup__input_type_card-name')
 const newCardLinkInput = addNewCardForm.querySelector('.popup__input_type_url')
 
+// Объект настроек валидации
+const validationConfig = {
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible'
+}
+
 
 //------------------- ФУНКЦИИ -------------------
 // Отправка формы редактирования профиля
 function handleProfileFormSubmit(evt) {
     evt.preventDefault()
-    if (profileNameInput.value.trim() && (profileJobInput.value.trim() !== '')) {
-        profileName.textContent = profileNameInput.value
-        profileJob.textContent = profileJobInput.value
-
-        closeModal(profileEditModal)
-    } else
-      alert('Пожалуйста, заполните все поля. Поле не может быть пустым или содержать одни пробелы')
+    profileName.textContent = profileNameInput.value
+    profileJob.textContent = profileJobInput.value
+    closeModal(profileEditModal)
 }
 
 // Отправка формы создания новой карточки
@@ -75,13 +82,16 @@ function handleNewCardFormSubmit(evt) {
       alert('Пожалуйста, заполните все поля. Поле не может быть пустым или содержать одни пробелы')
 }
 
-//Функция открытия модального окна изображения карточки
+// Функция открытия модального окна изображения карточки
 function openImgModal(name, link) {
   openModal(cardImagePopup)
   popupImage.alt = name
   popupCaption.textContent = name
   popupImage.src = link
 }
+
+// Вызов функции валидации всех форм
+enableValidation(validationConfig)
 
 
 //------------------- КНОПКИ -------------------
@@ -90,6 +100,7 @@ profileEditBtn.addEventListener('click', () => {
     profileNameInput.value = profileName.textContent
     profileJobInput.value = profileJob.textContent
     openModal(profileEditModal)
+    clearValidation(profileEditForm, validationConfig)
 })
 
 // Кнопка "+" добавить новую карточку
@@ -97,6 +108,7 @@ profileAddBtn.addEventListener('click', () => {
     newCardNameInput.value = ''
     newCardLinkInput.value = ''
     openModal(addNewCardModal)
+    clearValidation(addNewCardForm, validationConfig)
 })
 
 // Кнопка "Сохранить" формы редактирования профиля
