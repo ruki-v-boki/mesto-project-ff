@@ -1,8 +1,9 @@
 import '../pages/index.css'
-import { initialCards } from '../components/cards.js'
-import { createCard, deleteCard, switchTheLikeBtn } from '../components/card.js'
-import { openModal, closeModal } from '../components/modal.js'
-import { enableValidation, clearValidation } from '../components/validation.js'
+import { config, getInitialCards, getUserData } from './api.js'
+import { createCard, deleteCard, switchTheLikeBtn } from './card.js'
+import { openModal, closeModal } from './modal.js'
+import { enableValidation, clearValidation } from './validation.js'
+
 
 // Контейнер карточек на странице
 const placesList = document.querySelector('.places__list')
@@ -57,41 +58,103 @@ const validationConfig = {
 
 
 //------------------- ФУНКЦИИ -------------------
+// Получить актуальные данные профиля с сервера
+function updateProfile() {
+    fetch(`${config.baseUrl}/users/me`, {
+        headers: config.headers,
+    })
+    .then((res) => {
+      if (res.ok) {
+            return res.json()
+        } else {
+            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
+        }
+    })
+    .then((data) => {
+      profileName.textContent = data.name
+      profileJob.textContent = data.about
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+}
+
+// Отрисовка карточек с сервера
+function renderCards(getCards, getUserInfo, cardContainer, createCard) {
+    Promise.all([getCards(), getUserInfo()])
+        .then(([cards, userInfo]) => {
+            cards.forEach(cardData => {
+                const currentUserId = userInfo._id
+                const cardAuthorId = cardData.owner._id
+                cardContainer.append(createCard(cardData, 
+                                                deleteCard, 
+                                                switchTheLikeBtn, 
+                                                openImgModal, 
+                                                currentUserId, 
+                                                cardAuthorId))
+            })
+        })
+        .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+}
+
 // Отправка формы редактирования профиля
 function handleProfileFormSubmit(evt) {
     evt.preventDefault()
-    profileName.textContent = profileNameInput.value
-    profileJob.textContent = profileJobInput.value
-    closeModal(profileEditModal)
+    fetch(`${config.baseUrl}/users/me`, {
+        method: 'PATCH',
+        headers: config.headers,
+        body: JSON.stringify({
+            name: profileNameInput.value,
+            about: profileJobInput.value,
+        }),
+    })
+    .then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
+        }
+    })
+    .then(currentUserData => {
+        profileName.textContent = currentUserData.name
+        profileJob.textContent = currentUserData.about
+        closeModal(profileEditModal)
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
 // Отправка формы создания новой карточки
 function handleNewCardFormSubmit(evt) {
     evt.preventDefault()
-    if (newCardNameInput.value.trim() !== '') {
-        const newCard = {
-            name: `${newCardNameInput.value}`,
-            link: `${newCardLinkInput.value}`
+    const newCard = {
+        name: newCardNameInput.value,
+        link: newCardLinkInput.value,
+    }
+    fetch(`${config.baseUrl}/cards`, {
+        method: 'POST',
+        headers: config.headers,
+        body: JSON.stringify(newCard)
+    })
+    .then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
         }
-        initialCards.push(newCard)
-        placesList.prepend(createCard(newCard, deleteCard, switchTheLikeBtn, openImgModal))
-
+    })
+    .then(newCardData => {
+        placesList.prepend(createCard(newCardData, deleteCard, switchTheLikeBtn, openImgModal))
         addNewCardForm.reset()
         closeModal(addNewCardModal)
-    } else
-      alert('Пожалуйста, заполните все поля. Поле не может быть пустым или содержать одни пробелы')
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
 // Функция открытия модального окна изображения карточки
 function openImgModal(name, link) {
-  openModal(cardImagePopup)
-  popupImage.alt = name
-  popupCaption.textContent = name
-  popupImage.src = link
+    openModal(cardImagePopup)
+    popupImage.alt = name
+    popupCaption.textContent = name
+    popupImage.src = link
 }
-
-// Вызов функции валидации всех форм
-enableValidation(validationConfig)
 
 
 //------------------- КНОПКИ -------------------
@@ -122,10 +185,13 @@ closeModalButtons.forEach((btn) => {
     const modal = btn.closest('.popup')
     btn.addEventListener('click', () => closeModal(modal))
 })
+
 //-----------------------------------------------
 
 // Плавное открытие/закрытие всех модальных окон
 modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
-// Вывод карточек на страницу
-initialCards.forEach((cardData) => placesList.append(createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal)))
+// Вызовы функций
+updateProfile()
+renderCards(getInitialCards, getUserData, placesList, createCard)
+enableValidation(validationConfig)
