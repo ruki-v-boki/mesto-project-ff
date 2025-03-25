@@ -1,7 +1,7 @@
 export { createCard, deleteCard, switchTheLikeBtn }
 
 // Функция создания карточки
-function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, currentUserId, cardAuthorId) {
+function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, currentUserId, cardAuthorId, openConfirmDeleteModal) {
     const cardTemplate = document.querySelector('#card-template').content
     const card = cardTemplate.querySelector('.card').cloneNode(true)
     const cardImage = card.querySelector('.card__image')
@@ -9,35 +9,98 @@ function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, curren
 
     const cardDeleteButton = card.querySelector('.card__delete-button')
     const cardLikeButton = card.querySelector('.card__like-button')
+    const cardLikesCounterElement = card.querySelector('.card__likes-counter')
 
+    const cardId = cardData._id
     const cardImageName = cardData.name
     const cardImageLink = cardData.link
+    const cardLikesValue = cardData.likes.length
+    const isLikedByCurrentUser = cardData.likes.some(card => card._id === currentUserId)
 
     cardImage.src = cardImageLink
     cardImage.alt = cardImageName
     cardTitle.textContent = cardImageName
+    cardLikesCounterElement.textContent = cardLikesValue
 
-    cardDeleteButton.addEventListener('click', deleteCard)
-    cardLikeButton.addEventListener('click', switchTheLikeBtn)
+    cardDeleteButton.addEventListener('click', (evt) => {
+        const cardElement = evt.target.closest('.card')
+        deleteCard(cardElement, cardId)
+    })
+
+    cardLikeButton.addEventListener('click', () => {
+        switchTheLikeBtn(cardId, cardLikeButton, cardLikesCounterElement)
+    })
+
     cardImage.addEventListener('click', () => openImgModal(cardImageName, cardImageLink))
 
     if (currentUserId !== cardAuthorId) {
         cardDeleteButton.style.display = 'none'
     }
 
+    if (isLikedByCurrentUser) {
+        cardLikeButton.classList.add('card__like-button_is-active')
+    }
+
+    function isEnableLike(cardLikesValue) {
+        if (cardLikesValue === 0) {
+            cardLikesCounterElement.style.display = 'none'
+        } else {
+            cardLikesCounterElement.style.display = 'block'
+        }
+    }
+    isEnableLike(cardLikesValue)
+
     return card
 }
 
 // Функции-обработчик события удаления карточки
-const deleteCard = evt => {
-    if (evt.target === evt.currentTarget) {
-        evt.currentTarget.closest('.card').remove()
-    }
+const deleteCard = (cardElement, cardId) => {
+    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/${cardId}`, {
+        method: 'DELETE',
+        headers: {
+        authorization: '7263799d-0cc7-4c40-bf32-62633bf1c840',
+        'Content-Type': 'application/json',
+        }
+    })
+    .then(res => {
+        if (res.ok) {
+            cardElement.remove()
+            console.log('Карточка удалена')
+        } else {
+            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
+        }
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
+
 // Функции-обработчик события переключения лайка карточки
-const switchTheLikeBtn = evt => {
-    if (evt.target === evt.currentTarget) {
-        evt.currentTarget.classList.toggle('card__like-button_is-active')
-    }
+const switchTheLikeBtn = (cardId, likeBtn, likeCounter) => {
+    const isLiked = likeBtn.classList.contains('card__like-button_is-active')
+    const variableMethod = isLiked ? 'DELETE' : 'PUT'
+
+    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/likes/${cardId}`, {
+        method: variableMethod,
+        headers: {
+            authorization: '7263799d-0cc7-4c40-bf32-62633bf1c840',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
+        }
+    })
+    .then(updatedCard => {
+        likeBtn.classList.toggle('card__like-button_is-active')
+        likeCounter.textContent = updatedCard.likes.length
+        if (likeCounter.textContent < 1) {
+            likeCounter.style.display = 'none'
+        } else {
+            likeCounter.style.display = 'block'
+        }
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }

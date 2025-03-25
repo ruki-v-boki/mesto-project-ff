@@ -73,4 +73,4 @@ function clearValidation(form, config) {
 
     submitButton.classList.add(config.inactiveButtonClass);
     submitButton.disabled = true;
-} 
+}

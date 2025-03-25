@@ -22,6 +22,8 @@ const profileAddBtn = profile.querySelector('.profile__add-button')
 // Модальне окна профиля
 const profileEditModal = document.querySelector('.popup_type_edit')
 const addNewCardModal = document.querySelector('.popup_type_new-card')
+const confirmDeleteCardModal = document.querySelector('.popup_type_delete-card')
+const confirmDeleteCardBtn = confirmDeleteCardModal.querySelector('.button')
 
 // Модальное окно изображения карточки
 const cardImagePopup = document.querySelector('.popup_type_image')
@@ -53,7 +55,7 @@ const validationConfig = {
     submitButtonSelector: '.popup__button',
     inactiveButtonClass: 'popup__button_disabled',
     inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
+    errorClass: 'popup__error_visible',
 }
 
 
@@ -89,7 +91,9 @@ function renderCards(getCards, getUserInfo, cardContainer, createCard) {
                                                 switchTheLikeBtn, 
                                                 openImgModal, 
                                                 currentUserId, 
-                                                cardAuthorId))
+                                                cardAuthorId,
+                                                openConfirmDeleteModal, 
+                                                ))
             })
         })
         .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
@@ -154,6 +158,10 @@ function openImgModal(name, link) {
     popupImage.alt = name
     popupCaption.textContent = name
     popupImage.src = link
+}
+
+function openConfirmDeleteModal() {
+    openModal(confirmDeleteCardModal)
 }
 
 
