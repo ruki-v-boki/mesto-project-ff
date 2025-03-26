@@ -14,6 +14,10 @@
   min-height: 100px;
 }
 
+.popup__content_edit-avatar {
+  min-height: 272px;
+}
+
 @media screen and (max-width: 568px) {
   .popup__content {
     width: 100%;

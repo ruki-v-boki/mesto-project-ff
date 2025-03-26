@@ -5,48 +5,63 @@ import { openModal, closeModal } from './modal.js'
 import { enableValidation, clearValidation } from './validation.js'
 
 
-// Контейнер карточек на странице
+
+
+//-------------- ПРОФИЛЬ --------------
+const profileName = document.querySelector('.profile__title')
+const profileJob = document.querySelector('.profile__description')
+const profileImage = document.querySelector('.profile__image')
+
+// Контейнер карточек
 const placesList = document.querySelector('.places__list')
 
-// Профиль
-const profile = document.querySelector('.profile')
-const profileName = profile.querySelector('.profile__title')
-const profileJob = profile.querySelector('.profile__description')
 
-// Кнопки профиля
-const profileEditBtn = profile.querySelector('.profile__edit-button')
-const profileAddBtn = profile.querySelector('.profile__add-button')
 
 
 //-------------- МОДАЛЬНЫЕ ОКНА --------------
-// Модальне окна профиля
+// Все модальные окна
+const modals = document.querySelectorAll('.popup')
+
+// Профиль
 const profileEditModal = document.querySelector('.popup_type_edit')
 const addNewCardModal = document.querySelector('.popup_type_new-card')
-const confirmDeleteCardModal = document.querySelector('.popup_type_delete-card')
-const confirmDeleteCardBtn = confirmDeleteCardModal.querySelector('.button')
 
-// Модальное окно изображения карточки
+// Аватар
+const profileImageEditModal = document.querySelector('.popup_type_new-avatar')
+
+// Карточка
 const cardImagePopup = document.querySelector('.popup_type_image')
 const popupImage = cardImagePopup.querySelector('.popup__image')
 const popupCaption = cardImagePopup.querySelector('.popup__caption')
 
-// Все модальные окна
-const modals = document.querySelectorAll('.popup')
 
+
+
+//-------------- КНОПКИ --------------
 // Все кнопки закрытия модальных окон
 const closeModalButtons = document.querySelectorAll('.popup__close')
 
+// Профиль
+const profileEditBtn = document.querySelector('.profile__edit-button')
+const profileAddBtn = document.querySelector('.profile__add-button')
+
+
+
 
 //------------------- ФОРМЫ -------------------
-// Форма редактирования профиля
+// Профиль
 const profileEditForm = document.forms['edit-profile']
 const profileNameInput = profileEditForm.querySelector('.popup__input_type_name')
 const profileJobInput = profileEditForm.querySelector('.popup__input_type_description')
 
-// Форма создания новой карточки
+// Карточка
 const addNewCardForm = document.forms['new-place']
 const newCardNameInput = addNewCardForm.querySelector('.popup__input_type_card-name')
 const newCardLinkInput = addNewCardForm.querySelector('.popup__input_type_url')
+
+// Аватар
+const profileEditAvatarForm = document.forms['new-avatar']
+const profileEditAvatarInput = profileEditAvatarForm.querySelector('.popup__input_type_url')
 
 // Объект настроек валидации
 const validationConfig = {
@@ -57,6 +72,7 @@ const validationConfig = {
     inputErrorClass: 'popup__input_type_error',
     errorClass: 'popup__error_visible',
 }
+
 
 
 //------------------- ФУНКЦИИ -------------------
@@ -75,9 +91,17 @@ function updateProfile() {
     .then((data) => {
       profileName.textContent = data.name
       profileJob.textContent = data.about
+      profileImage.style.backgroundImage = `url(${data.avatar})`
     })
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
+
+
+
+
+
+
+
 
 // Отрисовка карточек с сервера
 function renderCards(getCards, getUserInfo, cardContainer, createCard) {
@@ -91,9 +115,8 @@ function renderCards(getCards, getUserInfo, cardContainer, createCard) {
                                                 switchTheLikeBtn, 
                                                 openImgModal, 
                                                 currentUserId, 
-                                                cardAuthorId,
-                                                openConfirmDeleteModal, 
-                                                ))
+                                                cardAuthorId
+                ))
             })
         })
         .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
@@ -152,6 +175,30 @@ function handleNewCardFormSubmit(evt) {
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
+// Отправка формы изменения аватара
+function handleAvatarSubmit(evt) {
+    evt.preventDefault()
+    fetch(`${config.baseUrl}/users/me/avatar`, {
+        method: 'PATCH',
+        headers: config.headers,
+        body: JSON.stringify({
+            avatar: profileEditAvatarInput.value,
+        }),
+    })
+    .then(res => {
+        if (res.ok) {
+            return res.json()
+        } else {
+            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
+        }
+    })
+    .then((newAvatar) => {
+        profileImage.style.backgroundImage = `url(${newAvatar.avatar})`
+        closeModal(profileImageEditModal)
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+}
+
 // Функция открытия модального окна изображения карточки
 function openImgModal(name, link) {
     openModal(cardImagePopup)
@@ -160,13 +207,9 @@ function openImgModal(name, link) {
     popupImage.src = link
 }
 
-function openConfirmDeleteModal() {
-    openModal(confirmDeleteCardModal)
-}
-
 
 //------------------- КНОПКИ -------------------
-// Кнопка "Редактировать профиль"
+// Профиль
 profileEditBtn.addEventListener('click', () => {
     profileNameInput.value = profileName.textContent
     profileJobInput.value = profileJob.textContent
@@ -174,7 +217,7 @@ profileEditBtn.addEventListener('click', () => {
     clearValidation(profileEditForm, validationConfig)
 })
 
-// Кнопка "+" добавить новую карточку
+// Карточка
 profileAddBtn.addEventListener('click', () => {
     newCardNameInput.value = ''
     newCardLinkInput.value = ''
@@ -182,11 +225,21 @@ profileAddBtn.addEventListener('click', () => {
     clearValidation(addNewCardForm, validationConfig)
 })
 
-// Кнопка "Сохранить" формы редактирования профиля
+// Аватар
+profileImage.addEventListener('click', () => {
+    profileEditAvatarInput.value = ''
+    openModal(profileImageEditModal)
+    clearValidation(profileEditAvatarForm, validationConfig)
+})
+
+// Кнопка "Сохранить" Профиль
 profileEditForm.addEventListener('submit', handleProfileFormSubmit)
 
-// Кнопка "Сохранить" формы создания новой карточки
+// Кнопка "Сохранить" Карточка
 addNewCardForm.addEventListener('submit', handleNewCardFormSubmit)
+
+// Кнопка "Сохранить" Аватар
+profileEditAvatarForm.addEventListener('submit', handleAvatarSubmit)
 
 // Все кнопки закрытия модальных окон
 closeModalButtons.forEach((btn) => {

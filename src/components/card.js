@@ -1,7 +1,7 @@
 export { createCard, deleteCard, switchTheLikeBtn }
 
 // Функция создания карточки
-function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, currentUserId, cardAuthorId, openConfirmDeleteModal) {
+function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, currentUserId, cardAuthorId) {
     const cardTemplate = document.querySelector('#card-template').content
     const card = cardTemplate.querySelector('.card').cloneNode(true)
     const cardImage = card.querySelector('.card__image')
@@ -48,6 +48,7 @@ function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, curren
             cardLikesCounterElement.style.display = 'block'
         }
     }
+
     isEnableLike(cardLikesValue)
 
     return card
