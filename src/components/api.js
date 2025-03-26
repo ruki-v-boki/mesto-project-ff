@@ -1,6 +1,6 @@
-export { config, getInitialCards, getUserData }
+export { config, getInitialCards, responseProcessing, getCurrentUserData, changeProfileData, changeProfileImage}
 
-// Основные настройки запроса к серверу
+//------------------- CONFIG -------------------
 const config = {
     baseUrl: 'https://nomoreparties.co/v1/wff-cohort-35',
     headers: {
@@ -9,42 +9,50 @@ const config = {
     }
 }
 
-// Загрузка информации о пользователе с сервера
-const getUserData = () => {
+const responseProcessing = res => 
+    res.ok ? res.json() : Promise.reject(`Что-то пошло не так: ${res.status}`)
+
+
+//------------------- GET -------------------
+// Профиль
+const getCurrentUserData = () => {
     return fetch(`${config.baseUrl}/users/me`, {
         headers: config.headers
     })
-    .then(res => {
-        if (res.ok) {
-            return res.json()
-        } else {
-            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
-        }
-    })
-    .then((userData) => {
-        return userData
-    })
-    .catch((err) => {
-        console.error(`Упс, ошибочка вышла: ${err}`)
-    })
+    .then(responseProcessing)
 }
 
-// Загрузка карточек с сервера
+// Карточки
 const getInitialCards = () => {
     return fetch(`${config.baseUrl}/cards`, {
         headers: config.headers
     })
-    .then(res => {
-        if (res.ok) {
-            return res.json()
-        } else {
-            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
-        }
+    .then(responseProcessing)
+}
+
+
+//------------------- PATCH -------------------
+// Профиль
+const changeProfileData = (name, about) => {
+    return fetch(`${config.baseUrl}/users/me`, {
+        method: 'PATCH',
+        headers: config.headers,
+        body: JSON.stringify({
+            name,
+            about,
+        }),
     })
-    .then((cardsData) => {
-        return cardsData
+    .then(responseProcessing)
+}
+
+// Аватар
+const changeProfileImage = avatar => {
+    return fetch(`${config.baseUrl}/users/me/avatar`, {
+        method: 'PATCH',
+        headers: config.headers,
+        body: JSON.stringify({
+            avatar,
+        }),
     })
-    .catch((err) => {
-        console.error(`Упс, ошибочка вышла: ${err}`)
-    })
+    .then(responseProcessing)
 }

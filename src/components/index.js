@@ -1,10 +1,8 @@
 import '../pages/index.css'
-import { config, getInitialCards, getUserData } from './api.js'
+import { config, getInitialCards, responseProcessing, getCurrentUserData, changeProfileData, changeProfileImage  } from './api.js'
 import { createCard, deleteCard, switchTheLikeBtn } from './card.js'
 import { openModal, closeModal } from './modal.js'
 import { enableValidation, clearValidation } from './validation.js'
-
-
 
 
 //-------------- ПРОФИЛЬ --------------
@@ -18,6 +16,10 @@ const placesList = document.querySelector('.places__list')
 
 
 
+
+
+
+
 //-------------- МОДАЛЬНЫЕ ОКНА --------------
 // Все модальные окна
 const modals = document.querySelectorAll('.popup')
@@ -27,12 +29,15 @@ const profileEditModal = document.querySelector('.popup_type_edit')
 const addNewCardModal = document.querySelector('.popup_type_new-card')
 
 // Аватар
-const profileImageEditModal = document.querySelector('.popup_type_new-avatar')
+const profileEditAvatarModal = document.querySelector('.popup_type_new-avatar')
 
 // Карточка
 const cardImagePopup = document.querySelector('.popup_type_image')
 const popupImage = cardImagePopup.querySelector('.popup__image')
 const popupCaption = cardImagePopup.querySelector('.popup__caption')
+
+
+
 
 
 
@@ -44,6 +49,12 @@ const closeModalButtons = document.querySelectorAll('.popup__close')
 // Профиль
 const profileEditBtn = document.querySelector('.profile__edit-button')
 const profileAddBtn = document.querySelector('.profile__add-button')
+
+
+
+
+
+
 
 
 
@@ -75,77 +86,48 @@ const validationConfig = {
 
 
 
+
+
+
+
+
+
+
 //------------------- ФУНКЦИИ -------------------
-// Получить актуальные данные профиля с сервера
+// Профиль
 function updateProfile() {
-    fetch(`${config.baseUrl}/users/me`, {
-        headers: config.headers,
-    })
-    .then((res) => {
-      if (res.ok) {
-            return res.json()
-        } else {
-            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
-        }
-    })
-    .then((data) => {
-      profileName.textContent = data.name
-      profileJob.textContent = data.about
-      profileImage.style.backgroundImage = `url(${data.avatar})`
+    getCurrentUserData()
+    .then((profileData) => {
+      profileName.textContent = profileData.name
+      profileJob.textContent = profileData.about
+      profileImage.style.backgroundImage = `url(${profileData.avatar})`
     })
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
-}
-
-
-
-
-
-
-
-
-// Отрисовка карточек с сервера
-function renderCards(getCards, getUserInfo, cardContainer, createCard) {
-    Promise.all([getCards(), getUserInfo()])
-        .then(([cards, userInfo]) => {
-            cards.forEach(cardData => {
-                const currentUserId = userInfo._id
-                const cardAuthorId = cardData.owner._id
-                cardContainer.append(createCard(cardData, 
-                                                deleteCard, 
-                                                switchTheLikeBtn, 
-                                                openImgModal, 
-                                                currentUserId, 
-                                                cardAuthorId
-                ))
-            })
-        })
-        .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
 // Отправка формы редактирования профиля
 function handleProfileFormSubmit(evt) {
     evt.preventDefault()
-    fetch(`${config.baseUrl}/users/me`, {
-        method: 'PATCH',
-        headers: config.headers,
-        body: JSON.stringify({
-            name: profileNameInput.value,
-            about: profileJobInput.value,
-        }),
-    })
-    .then(res => {
-        if (res.ok) {
-            return res.json()
-        } else {
-            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
-        }
-    })
-    .then(currentUserData => {
-        profileName.textContent = currentUserData.name
-        profileJob.textContent = currentUserData.about
+
+    changeProfileData(profileNameInput.value, profileJobInput.value)
+    .then(profileData => {
+        profileName.textContent = profileData.name
+        profileJob.textContent = profileData.about
         closeModal(profileEditModal)
     })
-    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+    .catch(err => console.error(`Упс, ошибочка обновления профиля: ${err}`))
+}
+
+// Отправка формы изменения аватара
+function handleAvatarFormSubmit(evt) {
+    evt.preventDefault()
+
+    changeProfileImage(profileEditAvatarInput.value)
+    .then((profileData) => {
+        profileImage.style.backgroundImage = `url(${profileData.avatar})`
+        closeModal(profileEditAvatarModal)
+    })
+    .catch(err => console.error(`Упс, ошибочка загрузки аватара: ${err}`))
 }
 
 // Отправка формы создания новой карточки
@@ -160,13 +142,7 @@ function handleNewCardFormSubmit(evt) {
         headers: config.headers,
         body: JSON.stringify(newCard)
     })
-    .then(res => {
-        if (res.ok) {
-            return res.json()
-        } else {
-            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
-        }
-    })
+    .then(responseProcessing)
     .then(newCardData => {
         placesList.prepend(createCard(newCardData, deleteCard, switchTheLikeBtn, openImgModal))
         addNewCardForm.reset()
@@ -175,31 +151,7 @@ function handleNewCardFormSubmit(evt) {
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
-// Отправка формы изменения аватара
-function handleAvatarSubmit(evt) {
-    evt.preventDefault()
-    fetch(`${config.baseUrl}/users/me/avatar`, {
-        method: 'PATCH',
-        headers: config.headers,
-        body: JSON.stringify({
-            avatar: profileEditAvatarInput.value,
-        }),
-    })
-    .then(res => {
-        if (res.ok) {
-            return res.json()
-        } else {
-            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
-        }
-    })
-    .then((newAvatar) => {
-        profileImage.style.backgroundImage = `url(${newAvatar.avatar})`
-        closeModal(profileImageEditModal)
-    })
-    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
-}
-
-// Функция открытия модального окна изображения карточки
+// Открытие попапа картинки карточки
 function openImgModal(name, link) {
     openModal(cardImagePopup)
     popupImage.alt = name
@@ -208,7 +160,20 @@ function openImgModal(name, link) {
 }
 
 
+
+
+
+
+
+
+
 //------------------- КНОПКИ -------------------
+// Все кнопки закрытия модальных окон
+closeModalButtons.forEach((btn) => {
+    const modal = btn.closest('.popup')
+    btn.addEventListener('click', () => closeModal(modal))
+})
+
 // Профиль
 profileEditBtn.addEventListener('click', () => {
     profileNameInput.value = profileName.textContent
@@ -228,7 +193,7 @@ profileAddBtn.addEventListener('click', () => {
 // Аватар
 profileImage.addEventListener('click', () => {
     profileEditAvatarInput.value = ''
-    openModal(profileImageEditModal)
+    openModal(profileEditAvatarModal)
     clearValidation(profileEditAvatarForm, validationConfig)
 })
 
@@ -239,13 +204,18 @@ profileEditForm.addEventListener('submit', handleProfileFormSubmit)
 addNewCardForm.addEventListener('submit', handleNewCardFormSubmit)
 
 // Кнопка "Сохранить" Аватар
-profileEditAvatarForm.addEventListener('submit', handleAvatarSubmit)
+profileEditAvatarForm.addEventListener('submit', handleAvatarFormSubmit)
 
-// Все кнопки закрытия модальных окон
-closeModalButtons.forEach((btn) => {
-    const modal = btn.closest('.popup')
-    btn.addEventListener('click', () => closeModal(modal))
-})
+
+
+
+
+
+
+
+
+
+
 
 //-----------------------------------------------
 
@@ -254,5 +224,44 @@ modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
 // Вызовы функций
 updateProfile()
-renderCards(getInitialCards, getUserData, placesList, createCard)
+// renderCards(getInitialCards, getUserData, placesList, createCard)
 enableValidation(validationConfig)
+
+
+
+Promise.all([getInitialCards(), getCurrentUserData()])
+    .then(([cards, userData]) => {
+        cards.forEach(cardData => {
+            const currentUserId = userData._id
+            const cardAuthorId = cardData.owner._id
+            placesList.append(createCard(cardData, 
+                                            deleteCard, 
+                                            switchTheLikeBtn, 
+                                            openImgModal, 
+                                            currentUserId, 
+                                            cardAuthorId
+            ))
+        })
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+
+
+
+    // Отрисовка карточек с сервера
+// function renderCards(getCards, getUserInfo, cardContainer, createCard) {
+    // Promise.all([getCards(), getUserInfo()])
+    //     .then(([cards, userInfo]) => {
+    //         cards.forEach(cardData => {
+    //             const currentUserId = userInfo._id
+    //             const cardAuthorId = cardData.owner._id
+    //             cardContainer.append(createCard(cardData, 
+    //                                             deleteCard, 
+    //                                             switchTheLikeBtn, 
+    //                                             openImgModal, 
+    //                                             currentUserId, 
+    //                                             cardAuthorId
+    //             ))
+    //         })
+    //     })
+    //     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+// }
