@@ -1,7 +1,7 @@
-export { createCard, deleteCard, switchTheLikeBtn }
+export { createCard, switchTheLikeBtn }
 
 // Функция создания карточки
-function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, currentUserId, cardAuthorId) {
+function createCard(cardData, switchTheLikeBtn, openImgModal, openConfirmDeleteModal, currentUserId, cardAuthorId,) {
     const cardTemplate = document.querySelector('#card-template').content
     const card = cardTemplate.querySelector('.card').cloneNode(true)
     const cardImage = card.querySelector('.card__image')
@@ -9,29 +9,27 @@ function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, curren
 
     const cardDeleteButton = card.querySelector('.card__delete-button')
     const cardLikeButton = card.querySelector('.card__like-button')
-    const cardLikesCounterElement = card.querySelector('.card__likes-counter')
 
-    const cardId = cardData._id
-    const cardImageName = cardData.name
-    const cardImageLink = cardData.link
-    const cardLikesValue = cardData.likes.length
+    const cardLikesCounterElement = card.querySelector('.card__likes-counter')
     const isLikedByCurrentUser = cardData.likes.some(card => card._id === currentUserId)
 
-    cardImage.src = cardImageLink
-    cardImage.alt = cardImageName
-    cardTitle.textContent = cardImageName
-    cardLikesCounterElement.textContent = cardLikesValue
+    cardImage.src = cardData.link
+    cardImage.alt = `На картинке изображено: ${cardData.name}`
+    cardTitle.textContent = cardData.name
+    cardLikesCounterElement.textContent = cardData.likes.length
+    card.dataset.cardId = cardData._id
 
-    cardDeleteButton.addEventListener('click', (evt) => {
-        const cardElement = evt.target.closest('.card')
-        deleteCard(cardElement, cardId)
+    cardDeleteButton.addEventListener('click', () => {
+        openConfirmDeleteModal(cardData._id)
     })
 
     cardLikeButton.addEventListener('click', () => {
-        switchTheLikeBtn(cardId, cardLikeButton, cardLikesCounterElement)
+        switchTheLikeBtn(cardData._id, cardLikeButton, cardLikesCounterElement)
     })
 
-    cardImage.addEventListener('click', () => openImgModal(cardImageName, cardImageLink))
+    cardImage.addEventListener('click', () => {
+        openImgModal(cardData.name, cardData.link)
+    })
 
     if (currentUserId !== cardAuthorId) {
         cardDeleteButton.style.display = 'none'
@@ -49,29 +47,9 @@ function createCard(cardData, deleteCard, switchTheLikeBtn, openImgModal, curren
         }
     }
 
-    isEnableLike(cardLikesValue)
+    isEnableLike(cardData.likes.length)
 
     return card
-}
-
-// Функции-обработчик события удаления карточки
-const deleteCard = (cardElement, cardId) => {
-    fetch(`https://nomoreparties.co/v1/wff-cohort-35/cards/${cardId}`, {
-        method: 'DELETE',
-        headers: {
-        authorization: '7263799d-0cc7-4c40-bf32-62633bf1c840',
-        'Content-Type': 'application/json',
-        }
-    })
-    .then(res => {
-        if (res.ok) {
-            cardElement.remove()
-            console.log('Карточка удалена')
-        } else {
-            return Promise.reject(`Упс, ошибочка вышла: ${res.status}`)
-        }
-    })
-    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
 

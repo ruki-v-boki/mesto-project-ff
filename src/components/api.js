@@ -1,11 +1,11 @@
-export { config, getInitialCards, responseProcessing, getCurrentUserData, changeProfileData, changeProfileImage}
+export { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard }
 
 //------------------- CONFIG -------------------
 const config = {
     baseUrl: 'https://nomoreparties.co/v1/wff-cohort-35',
     headers: {
         authorization: '7263799d-0cc7-4c40-bf32-62633bf1c840',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     }
 }
 
@@ -33,26 +33,47 @@ const getInitialCards = () => {
 
 //------------------- PATCH -------------------
 // Профиль
-const changeProfileData = (name, about) => {
+const changeProfileData = newProfileData => {
     return fetch(`${config.baseUrl}/users/me`, {
         method: 'PATCH',
         headers: config.headers,
-        body: JSON.stringify({
-            name,
-            about,
-        }),
+        body: JSON.stringify(newProfileData),
     })
     .then(responseProcessing)
 }
 
 // Аватар
-const changeProfileImage = avatar => {
+const changeProfileImage = newAvatar => {
     return fetch(`${config.baseUrl}/users/me/avatar`, {
         method: 'PATCH',
         headers: config.headers,
-        body: JSON.stringify({
-            avatar,
-        }),
+        body: JSON.stringify(newAvatar),
     })
     .then(responseProcessing)
 }
+
+
+//------------------- POST -------------------
+// Карточка
+const postNewCard = newCardData => {
+    return fetch(`${config.baseUrl}/cards`, {
+        method: 'POST',
+        headers: config.headers,
+        body: JSON.stringify(newCardData)
+    })
+    .then(responseProcessing)
+}
+
+
+//------------------- DELETE -------------------
+// Карточка
+const deleteCard = cardId => {
+    return fetch(`${config.baseUrl}/cards/${cardId}`, {
+        method: 'DELETE',
+        headers: config.headers,
+    })
+    .then(responseProcessing)
+}
+
+
+

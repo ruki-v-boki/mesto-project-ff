@@ -4,15 +4,15 @@ export { enableValidation, clearValidation }
 function enableValidation(config) {
     const forms = document.querySelectorAll(config.formSelector)
 
-    forms.forEach((form) => {
+    forms.forEach(form => {
         const inputs = form.querySelectorAll(config.inputSelector)
         const submitButton = form.querySelector(config.submitButtonSelector)
 
-        inputs.forEach((input) => {
-        input.addEventListener('input', () => {
-            isInputValid(form, input, config.inputErrorClass, config.errorClass)
-            toggleSubmitButton(inputs, submitButton, config.inactiveButtonClass)
-        })
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                isInputValid(form, input, config.inputErrorClass, config.errorClass)
+                toggleSubmitButton(inputs, submitButton, config.inactiveButtonClass)
+            })
         })
 
         toggleSubmitButton(inputs, submitButton, config.inactiveButtonClass)
@@ -38,12 +38,12 @@ function isInputValid(form, input, inputErrorClass, errorClass) {
         input.classList.remove(inputErrorClass)
         errorItem.classList.remove(errorClass)
         errorItem.textContent = ''
-  }
+    }
 }
 
 // Переключение состояния кнопки при валидации
 function toggleSubmitButton(inputs, submitButton, inactiveButtonClass) {
-    const hasInvalidInput = Array.from(inputs).some((input) => !input.validity.valid)
+    const hasInvalidInput = Array.from(inputs).some(input => !input.validity.valid)
 
     if (hasInvalidInput) {
         submitButton.classList.add(inactiveButtonClass)
@@ -59,7 +59,7 @@ function clearValidation(form, config) {
     const inputs = form.querySelectorAll(config.inputSelector)
     const submitButton = form.querySelector(config.submitButtonSelector)
 
-    inputs.forEach((input) => {
+    inputs.forEach(input => {
         const errorItem = form.querySelector(`.${input.id}-error`)
 
         input.setCustomValidity('')
