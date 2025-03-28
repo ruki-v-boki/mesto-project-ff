@@ -5,7 +5,7 @@ import { openModal, closeModal } from './modal.js'
 import { enableValidation, clearValidation } from './validation.js'
 
 
-//-------------- ПРОФИЛЬ --------------
+//------------------- ПРОФИЛЬ -------------------
 const profileName = document.querySelector('.profile__title')
 const profileJob = document.querySelector('.profile__description')
 const profileImage = document.querySelector('.profile__image')
@@ -14,7 +14,7 @@ const profileImage = document.querySelector('.profile__image')
 const cardContainer = document.querySelector('.places__list')
 
 
-//------------------- МОДАЛЬНЫЕ ОКНА --------------
+//------------------- МОДАЛЬНЫЕ ОКНА -------------------
 // Все модальные окна
 const modals = document.querySelectorAll('.popup')
 
@@ -245,7 +245,9 @@ allPopupButtons.forEach(btn => {
 })
 
 // Плавное открытие/закрытие всех модальных окон
-modals.forEach((modal) => modal.classList.add('popup_is-animated'))
+modals.forEach((modal) => {
+    modal.classList.add('popup_is-animated')
+})
 
 //-----------------------------------------------
 // Вызовы функций

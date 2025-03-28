@@ -14,29 +14,9 @@
   margin-bottom: 0;
 }
 
-.popup__input_type_error {
-  border-block-end: 1px solid red;
-}
-
-.popup__error_visible {
-  color: red;
-  display: block;
-  visibility: visible;
-  font-family: Inter;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 100%;
-  letter-spacing: 0%;
-}
-
 @media screen and (max-width: 568px) {
   .popup__title {
     font-size: 12px;
     line-height: 15px;
   }
-}
-
-
-.popup__input:focus-visible {
-  outline: none;
 }

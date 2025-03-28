@@ -3,14 +3,14 @@ export { openModal, closeModal }
 // Функция открытия модального окна
 const openModal = (modal) => {
     modal.classList.add('popup_is-opened')
-    modal.addEventListener('click', closeModalByOverlayClick)
+    modal.addEventListener('mousedown', closeModalByOverlayClick)
     document.addEventListener('keydown', closeModalByKey)
 }
 
 // Функция закрытия модального окна
 const closeModal = modal => {
     modal.classList.remove('popup_is-opened')
-    modal.removeEventListener('click', closeModalByOverlayClick)
+    modal.removeEventListener('mousedown', closeModalByOverlayClick)
     document.removeEventListener('keydown', closeModalByKey)
 }
 
