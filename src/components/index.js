@@ -38,6 +38,9 @@ const confirmDeleteModal = document.querySelector('.popup_type_delete-card')
 // Все кнопки закрытия модальных окон
 const closeModalButtons = document.querySelectorAll('.popup__close')
 
+// Все кнопки модальных окон
+const allPopupButtons = document.querySelectorAll('.popup__button')
+
 // Профиль
 const profileEditBtn = document.querySelector('.profile__edit-button')
 const profileAddBtn = document.querySelector('.profile__add-button')
@@ -73,6 +76,17 @@ const validationConfig = {
 
 
 //------------------- ФУНКЦИИ -------------------
+// Лоадер
+function renderLoading(isLoading, button) {
+    if (isLoading) {
+        button.classList.add('popup__button_loading')
+        button.textContent = 'Сохранение'
+    } else {
+        button.classList.remove('popup__button_loading')
+        button.textContent = button.dataset.originalText
+    }
+}
+
 // Профиль
 function updateProfile() {
     getCurrentUserData()
@@ -87,11 +101,12 @@ function updateProfile() {
 // Отправка формы Профиля
 function handleProfileFormSubmit(evt) {
     evt.preventDefault()
-
+    const saveButton = profileEditForm.querySelector('.popup__button')
     const newProfileData = {
         name: profileNameInput.value,
         about: profileJobInput.value,
     }
+    renderLoading(true, saveButton)
 
     changeProfileData(newProfileData)
     .then(newProfileData => {
@@ -100,13 +115,16 @@ function handleProfileFormSubmit(evt) {
         closeModal(profileEditModal)
     })
     .catch(err => console.error(`Упс, ошибочка обновления профиля: ${err}`))
+    .finally(() => renderLoading(false, saveButton))
 }
 
 // Отправка формы Аватара
 function handleAvatarFormSubmit(evt) {
     evt.preventDefault()
 
+    const saveButton = profileEditAvatarForm.querySelector('.popup__button')
     const newAvatar = {avatar: profileEditAvatarInput.value}
+    renderLoading(true, saveButton)
 
     changeProfileImage(newAvatar)
     .then((profileData) => {
@@ -114,16 +132,19 @@ function handleAvatarFormSubmit(evt) {
         closeModal(profileEditAvatarModal)
     })
     .catch(err => console.error(`Упс, ошибочка загрузки аватара: ${err}`))
+    .finally(() => renderLoading(false, saveButton))
 }
 
 // Отправка формы создания новой Карточки
 function handleNewCardFormSubmit(evt) {
     evt.preventDefault()
 
+    const saveButton = addNewCardForm.querySelector('.popup__button')
     const newCard = {
         name: newCardNameInput.value,
         link: newCardLinkInput.value,
     }
+    renderLoading(true, saveButton)
 
     postNewCard(newCard)
     .then(newCardData => {
@@ -136,6 +157,7 @@ function handleNewCardFormSubmit(evt) {
         closeModal(addNewCardModal)
     })
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+    .finally(() => renderLoading(false, saveButton))
 }
 
 // Открытие попапа картинки Карточки
@@ -203,9 +225,10 @@ profileEditAvatarForm.addEventListener('submit', handleAvatarFormSubmit)
 // "Да" Удаление
 confirmDeleteForm.addEventListener('submit', (evt) => {
     evt.preventDefault()
-
+    const saveButton = confirmDeleteForm.querySelector('.popup__button')
     const cardId = confirmDeleteModal.dataset.cardId
     const cardElement = document.querySelector(`[data-card-id="${cardId}"]`)
+    renderLoading(true, saveButton)
 
     deleteCard(cardId)
     .then(() => {
@@ -213,14 +236,18 @@ confirmDeleteForm.addEventListener('submit', (evt) => {
         closeModal(confirmDeleteModal)
     })
     .catch(err => console.error("Ошибка удаления:", err))
+    .finally(() => renderLoading(false, saveButton))
 })
 
-
-//-----------------------------------------------
+// Записываю оригинальный текст кнопок
+allPopupButtons.forEach(btn => {
+    btn.dataset.originalText = btn.textContent
+})
 
 // Плавное открытие/закрытие всех модальных окон
 modals.forEach((modal) => modal.classList.add('popup_is-animated'))
 
+//-----------------------------------------------
 // Вызовы функций
 updateProfile()
 enableValidation(validationConfig)
