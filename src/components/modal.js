@@ -1,7 +1,7 @@
 export { openModal, closeModal }
 
 // Функция открытия модального окна
-const openModal = modal => {
+const openModal = (modal) => {
     modal.classList.add('popup_is-opened')
     modal.addEventListener('click', closeModalByOverlayClick)
     document.addEventListener('keydown', closeModalByKey)

@@ -1,4 +1,4 @@
-export { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard }
+export { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard, switchLike }
 
 //------------------- CONFIG -------------------
 const config = {
@@ -75,5 +75,16 @@ const deleteCard = cardId => {
     .then(responseProcessing)
 }
 
+// Лайк Карточки
+const switchLike = (cardId, likeBtn, likeCounter) => {
+    const isLiked = likeBtn.classList.contains('card__like-button_is-active')
+    const variableMethod = isLiked ? 'DELETE' : 'PUT'
+
+    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+        method: variableMethod,
+        headers: config.headers,
+    })
+    .then(responseProcessing)
+}
 
 

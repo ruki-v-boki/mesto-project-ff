@@ -1,6 +1,6 @@
 import '../pages/index.css'
-import { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard } from './api.js'
-import { createCard, switchTheLikeBtn } from './card.js'
+import { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard, switchLike } from './api.js'
+import { createCard } from './card.js'
 import { openModal, closeModal } from './modal.js'
 import { enableValidation, clearValidation } from './validation.js'
 
@@ -14,7 +14,7 @@ const profileImage = document.querySelector('.profile__image')
 const cardContainer = document.querySelector('.places__list')
 
 
-//-------------- МОДАЛЬНЫЕ ОКНА --------------
+//------------------- МОДАЛЬНЫЕ ОКНА --------------
 // Все модальные окна
 const modals = document.querySelectorAll('.popup')
 
@@ -34,7 +34,7 @@ const popupCaption = cardImagePopup.querySelector('.popup__caption')
 const confirmDeleteModal = document.querySelector('.popup_type_delete-card')
 
 
-//-------------- КНОПКИ --------------
+//------------------- КНОПКИ ------------------
 // Все кнопки закрытия модальных окон
 const closeModalButtons = document.querySelectorAll('.popup__close')
 
@@ -84,7 +84,7 @@ function updateProfile() {
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
 }
 
-// Отправка формы редактирования Профиля
+// Отправка формы Профиля
 function handleProfileFormSubmit(evt) {
     evt.preventDefault()
 
@@ -102,7 +102,7 @@ function handleProfileFormSubmit(evt) {
     .catch(err => console.error(`Упс, ошибочка обновления профиля: ${err}`))
 }
 
-// Отправка формы изменения Аватара
+// Отправка формы Аватара
 function handleAvatarFormSubmit(evt) {
     evt.preventDefault()
 
@@ -128,7 +128,7 @@ function handleNewCardFormSubmit(evt) {
     postNewCard(newCard)
     .then(newCardData => {
         cardContainer.prepend(createCard(newCardData,
-                                        switchTheLikeBtn,
+                                        switchLike,
                                         openImgModal,
                                         openConfirmDeleteModal
         ))
@@ -150,6 +150,8 @@ function openImgModal(name, link) {
 function openConfirmDeleteModal(cardId) {
     confirmDeleteModal.dataset.cardId = cardId
     openModal(confirmDeleteModal)
+
+    confirmDeleteForm.elements['delete-button'].focus()
 }
 
 
@@ -166,6 +168,8 @@ profileEditBtn.addEventListener('click', () => {
     profileJobInput.value = profileJob.textContent
     openModal(profileEditModal)
     clearValidation(profileEditForm, validationConfig)
+
+    profileNameInput.focus()
 })
 
 // Карточка
@@ -174,6 +178,8 @@ profileAddBtn.addEventListener('click', () => {
     newCardLinkInput.value = ''
     openModal(addNewCardModal)
     clearValidation(addNewCardForm, validationConfig)
+
+    newCardNameInput.focus()
 })
 
 // Аватар
@@ -181,6 +187,8 @@ profileImage.addEventListener('click', () => {
     profileEditAvatarInput.value = ''
     openModal(profileEditAvatarModal)
     clearValidation(profileEditAvatarForm, validationConfig)
+
+    profileEditAvatarInput.focus()
 })
 
 // "Сохранить" Профиль
@@ -222,12 +230,12 @@ Promise.all([getInitialCards(), getCurrentUserData()])
         cards.forEach(cardData => {
             const currentUserId = userData._id
             const cardAuthorId = cardData.owner._id
-            cardContainer.append(createCard(cardData, 
-                                            switchTheLikeBtn, 
-                                            openImgModal, 
+            cardContainer.append(createCard(cardData,
+                                            switchLike,
+                                            openImgModal,
                                             openConfirmDeleteModal,
-                                            currentUserId, 
-                                            cardAuthorId,
+                                            currentUserId,
+                                            cardAuthorId
             ))
         })
     })

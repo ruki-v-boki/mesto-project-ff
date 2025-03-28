@@ -41,7 +41,7 @@
     </footer>
 
     <!-- POPUP PROFILE -->
-    <div class="popup popup_type_edit">
+    <div class="popup popup_type_edit" tabindex="-1">
       <div class="popup__content">
         <button type="button" class="popup__close"></button>
         <h3 class="popup__title">Редактировать профиль</h3>
@@ -60,7 +60,7 @@
     </div>
 
     <!-- POPUP NEW PLACE-->
-    <div class="popup popup_type_new-card">
+    <div class="popup popup_type_new-card" tabindex="-1">
       <div class="popup__content">
         <button type="button" class="popup__close"></button>
         <h3 class="popup__title">Новое место</h3>
@@ -77,7 +77,7 @@
     </div>
 
     <!-- POPUP NEW AVATAR -->
-    <div class="popup popup_type_new-avatar">
+    <div class="popup popup_type_new-avatar" tabindex="-1">
       <div class="popup__content popup__content_edit-avatar">
         <button type="button" class="popup__close"></button>
         <h3 class="popup__title">Обновить аватар</h3>
@@ -90,7 +90,7 @@
     </div>
 
     <!-- POPUP LIGHTBOX IMAGE-->
-    <div class="popup popup_type_image">
+    <div class="popup popup_type_image" tabindex="-1">
       <div class="popup__content popup__content_content_image">
         <button type="button" class="popup__close"></button>
         <img src="" alt="" class="popup__image">
@@ -99,12 +99,12 @@
     </div>
 
     <!-- POPUP DELETE CARD -->
-    <div class="popup popup_type_delete-card">
+    <div class="popup popup_type_delete-card" tabindex="-1">
       <div class="popup__content popup__content_confirm-delete">
         <button type="button" class="popup__close"></button>
         <h3 class="popup__title">Вы уверены?</h3>
         <form novalidate class="popup__form" name="confirm-delete">
-          <button type="submit" class="button popup__button popup__button_confirm-delete">Да</button>
+          <button name="delete-button" type="submit" class="button popup__button popup__button_confirm-delete">Да</button>
         </form>
       </div>
     </div>
