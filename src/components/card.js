@@ -1,7 +1,7 @@
-export { createCard }
+export { createCard, deleteCardElement }
 
 // Функция создания карточки
-function createCard(cardData, switchLike, openImgModal, openConfirmDeleteModal, currentUserId, cardAuthorId,) {
+function createCard(cardData, switchLike, openImgModal, openConfirmDeleteModal, currentUserId) {
     const cardTemplate = document.querySelector('#card-template').content
     const card = cardTemplate.querySelector('.card').cloneNode(true)
     const cardImage = card.querySelector('.card__image')
@@ -14,40 +14,41 @@ function createCard(cardData, switchLike, openImgModal, openConfirmDeleteModal, 
     const isLikedByCurrentUser = cardData.likes.some(card => card._id === currentUserId)
 
     cardImage.src = cardData.link
-    cardImage.alt = `На картинке изображено: ${cardData.name}`
+    cardImage.alt = cardData.name
     cardTitle.textContent = cardData.name
     cardLikesCounterElement.textContent = cardData.likes.length
-    card.dataset.cardId = cardData._id
 
 
 //------------------- СЛУШАТЕЛИ -------------------
     cardLikeButton.addEventListener('click', () => {
-        switchLike(cardData._id, cardLikeButton, cardLikesCounterElement)
+        const isCardLiked = cardLikeButton.classList.contains('card__like-button_is-active')
+
+        switchLike(cardData._id, isCardLiked)
         .then(updatedCard => {
             cardLikeButton.classList.toggle('card__like-button_is-active')
             cardLikesCounterElement.textContent = updatedCard.likes.length
 
             if (cardLikesCounterElement.textContent < 1) {
-                cardLikesCounterElement.style.display = 'none'
+                cardLikesCounterElement.classList.add('display-disabled')
             } else {
-                cardLikesCounterElement.style.display = 'block'
+                cardLikesCounterElement.classList.remove('display-disabled')
             }
         })
         .catch(err => console.error(`Упс, лайнуть не удалось: ${err}`))
     })
 
-    cardImage.addEventListener('click', () => {
+    cardImage.addEventListener('click', (evt) => {
         openImgModal(cardData.name, cardData.link)
     })
 
     cardDeleteButton.addEventListener('click', () => {
-        openConfirmDeleteModal(cardData._id)
+        openConfirmDeleteModal(cardData._id, card)
     })
 
 
 //------------------- УСЛОВИЯ -------------------
-    if (currentUserId !== cardAuthorId) {
-        cardDeleteButton.style.display = 'none'
+    if (currentUserId !== cardData.owner._id) {
+        cardDeleteButton.classList.add('display-disabled')
     }
 
     if (isLikedByCurrentUser) {
@@ -55,11 +56,17 @@ function createCard(cardData, switchLike, openImgModal, openConfirmDeleteModal, 
     }
 
     if (cardData.likes.length === 0) {
-        cardLikesCounterElement.style.display = 'none'
+        cardLikesCounterElement.classList.add('display-disabled')
+
     } else {
-        cardLikesCounterElement.style.display = 'block'
+        cardLikesCounterElement.classList.remove('display-disabled')
     }
 
 
     return card
+}
+
+// Функция удаления карточки
+function deleteCardElement(cardElement) {
+    cardElement.remove()
 }

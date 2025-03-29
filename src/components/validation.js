@@ -31,13 +31,9 @@ function isInputValid(form, input, inputErrorClass, errorClass) {
     }
 
     if (!input.validity.valid) {
-        input.classList.add(inputErrorClass)
-        errorItem.classList.add(errorClass)
-        errorItem.textContent = input.validationMessage
+        showError(input, errorItem, inputErrorClass, errorClass)
     } else {
-        input.classList.remove(inputErrorClass)
-        errorItem.classList.remove(errorClass)
-        errorItem.textContent = ''
+        deleteError(input, errorItem, inputErrorClass, errorClass)
     }
 }
 
@@ -57,20 +53,25 @@ function toggleSubmitButton(inputs, submitButton, inactiveButtonClass) {
 // Очистка сообщений об ошибках
 function clearValidation(form, config) {
     const inputs = form.querySelectorAll(config.inputSelector)
-    const submitButton = form.querySelector(config.submitButtonSelector)
 
     inputs.forEach(input => {
         const errorItem = form.querySelector(`.${input.id}-error`)
 
         input.setCustomValidity('')
-        input.classList.remove(config.inputErrorClass)
-
-        if (errorItem) {
-            errorItem.textContent = ''
-            errorItem.classList.remove(config.errorClass)
-        }
+        deleteError(input, errorItem, config.inputErrorClass, config.errorClass)
     })
+}
 
-    submitButton.classList.add(config.inactiveButtonClass);
-    submitButton.disabled = true;
+// Показать ошибку
+function showError(input, errorItem, inputErrorClass, errorClass) {
+    input.classList.add(inputErrorClass)
+    errorItem.classList.add(errorClass)
+    errorItem.textContent = input.validationMessage
+}
+
+// Удалить сообщение об ошибке
+function deleteError(input, errorItem, inputErrorClass, errorClass) {
+    input.classList.remove(inputErrorClass)
+    errorItem.classList.remove(errorClass)
+    errorItem.textContent = ''
 }

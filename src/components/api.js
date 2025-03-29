@@ -76,9 +76,8 @@ const deleteCard = cardId => {
 }
 
 // Лайк Карточки
-const switchLike = (cardId, likeBtn, likeCounter) => {
-    const isLiked = likeBtn.classList.contains('card__like-button_is-active')
-    const variableMethod = isLiked ? 'DELETE' : 'PUT'
+const switchLike = (cardId, likeStatus) => {
+    const variableMethod = likeStatus ? 'DELETE' : 'PUT'
 
     return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
         method: variableMethod,

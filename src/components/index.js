@@ -1,6 +1,6 @@
 import '../pages/index.css'
 import { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard, switchLike } from './api.js'
-import { createCard } from './card.js'
+import { createCard, deleteCardElement } from './card.js'
 import { openModal, closeModal } from './modal.js'
 import { enableValidation, clearValidation } from './validation.js'
 
@@ -74,13 +74,19 @@ const validationConfig = {
     errorClass: 'popup__error_visible',
 }
 
+// Карточка для удаления
+const cardForDelete = {
+    cardId: '',
+    cardElement: null,
+}
+
 
 //------------------- ФУНКЦИИ -------------------
 // Лоадер
-function renderLoading(isLoading, button) {
+function renderLoading(isLoading, button, loadingText) {
     if (isLoading) {
         button.classList.add('popup__button_loading')
-        button.textContent = 'Сохранение'
+        button.textContent = loadingText
     } else {
         button.classList.remove('popup__button_loading')
         button.textContent = button.dataset.originalText
@@ -88,25 +94,20 @@ function renderLoading(isLoading, button) {
 }
 
 // Профиль
-function updateProfile() {
-    getCurrentUserData()
-    .then(profileData => {
-      profileName.textContent = profileData.name
-      profileJob.textContent = profileData.about
-      profileImage.style.backgroundImage = `url(${profileData.avatar})`
-    })
-    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+function updateProfile(profileData) {
+    profileName.textContent = profileData.name
+    profileJob.textContent = profileData.about
+    profileImage.style.backgroundImage = `url(${profileData.avatar})`
 }
 
 // Отправка формы Профиля
 function handleProfileFormSubmit(evt) {
     evt.preventDefault()
-    const saveButton = profileEditForm.querySelector('.popup__button')
     const newProfileData = {
         name: profileNameInput.value,
         about: profileJobInput.value,
     }
-    renderLoading(true, saveButton)
+    renderLoading(true, evt.submitter, 'Сохранение')
 
     changeProfileData(newProfileData)
     .then(newProfileData => {
@@ -115,16 +116,14 @@ function handleProfileFormSubmit(evt) {
         closeModal(profileEditModal)
     })
     .catch(err => console.error(`Упс, ошибочка обновления профиля: ${err}`))
-    .finally(() => renderLoading(false, saveButton))
+    .finally(() => renderLoading(false, evt.submitter))
 }
 
 // Отправка формы Аватара
 function handleAvatarFormSubmit(evt) {
     evt.preventDefault()
-
-    const saveButton = profileEditAvatarForm.querySelector('.popup__button')
     const newAvatar = {avatar: profileEditAvatarInput.value}
-    renderLoading(true, saveButton)
+    renderLoading(true, evt.submitter, 'Сохранение')
 
     changeProfileImage(newAvatar)
     .then((profileData) => {
@@ -132,45 +131,48 @@ function handleAvatarFormSubmit(evt) {
         closeModal(profileEditAvatarModal)
     })
     .catch(err => console.error(`Упс, ошибочка загрузки аватара: ${err}`))
-    .finally(() => renderLoading(false, saveButton))
+    .finally(() => renderLoading(false, evt.submitter))
 }
 
 // Отправка формы создания новой Карточки
 function handleNewCardFormSubmit(evt) {
     evt.preventDefault()
-
-    const saveButton = addNewCardForm.querySelector('.popup__button')
     const newCard = {
         name: newCardNameInput.value,
         link: newCardLinkInput.value,
     }
-    renderLoading(true, saveButton)
+    renderLoading(true, evt.submitter, 'Сохранение')
 
     postNewCard(newCard)
     .then(newCardData => {
         cardContainer.prepend(createCard(newCardData,
                                         switchLike,
                                         openImgModal,
-                                        openConfirmDeleteModal
+                                        openConfirmDeleteModal,
+                                        newCardData.owner._id
         ))
         addNewCardForm.reset()
         closeModal(addNewCardModal)
     })
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
-    .finally(() => renderLoading(false, saveButton))
+    .finally(() => renderLoading(false, evt.submitter))
 }
 
 // Открытие попапа картинки Карточки
 function openImgModal(name, link) {
     openModal(cardImagePopup)
-    popupImage.alt = `На картинке изображено: ${name}`
+    popupImage.alt = name
     popupCaption.textContent = name
     popupImage.src = link
+
+    cardImagePopup.querySelector('.popup__close').focus()
 }
 
 // Открытие попапа Удаления
-function openConfirmDeleteModal(cardId) {
-    confirmDeleteModal.dataset.cardId = cardId
+function openConfirmDeleteModal(cardId, cardElement) {
+    cardForDelete.cardId = cardId
+    cardForDelete.cardElement = cardElement
+
     openModal(confirmDeleteModal)
 
     confirmDeleteForm.elements['delete-button'].focus()
@@ -225,18 +227,15 @@ profileEditAvatarForm.addEventListener('submit', handleAvatarFormSubmit)
 // "Да" Удаление
 confirmDeleteForm.addEventListener('submit', (evt) => {
     evt.preventDefault()
-    const saveButton = confirmDeleteForm.querySelector('.popup__button')
-    const cardId = confirmDeleteModal.dataset.cardId
-    const cardElement = document.querySelector(`[data-card-id="${cardId}"]`)
-    renderLoading(true, saveButton)
+    renderLoading(true, evt.submitter, 'Удаление')
 
-    deleteCard(cardId)
+    deleteCard(cardForDelete.cardId)
     .then(() => {
-        cardElement.remove()
+        deleteCardElement(cardForDelete.cardElement)
         closeModal(confirmDeleteModal)
     })
     .catch(err => console.error("Ошибка удаления:", err))
-    .finally(() => renderLoading(false, saveButton))
+    .finally(() => renderLoading(false, evt.submitter))
 })
 
 // Записываю оригинальный текст кнопок
@@ -251,21 +250,18 @@ modals.forEach((modal) => {
 
 //-----------------------------------------------
 // Вызовы функций
-updateProfile()
 enableValidation(validationConfig)
 
 Promise.all([getInitialCards(), getCurrentUserData()])
     .then(([cards, userData]) => {
         cards.forEach(cardData => {
-            const currentUserId = userData._id
-            const cardAuthorId = cardData.owner._id
             cardContainer.append(createCard(cardData,
                                             switchLike,
                                             openImgModal,
                                             openConfirmDeleteModal,
-                                            currentUserId,
-                                            cardAuthorId
+                                            userData._id
             ))
         })
+        updateProfile(userData)
     })
     .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))

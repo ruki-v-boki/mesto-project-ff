@@ -2,7 +2,6 @@
   width: 21px;
   height: 18px;
   background: transparent url('../../../images/like-inactive.svg') no-repeat;
-  
   background-size: 21px 18px;
   border: none;
   cursor: pointer;
@@ -26,8 +25,11 @@
 }
 
 .card__likes-counter {
+  /* display: block; */
   font-size: 13px;
-  /* color: red; */
   margin-top: 3px;
-  /* visibility: hidden; */
+}
+
+.display-disabled {
+  display: none;
 }
