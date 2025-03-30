@@ -53,6 +53,7 @@ function toggleSubmitButton(inputs, submitButton, inactiveButtonClass) {
 // Очистка сообщений об ошибках
 function clearValidation(form, config) {
     const inputs = form.querySelectorAll(config.inputSelector)
+    const submitButton = form.querySelector(config.submitButtonSelector)
 
     inputs.forEach(input => {
         const errorItem = form.querySelector(`.${input.id}-error`)
@@ -60,6 +61,7 @@ function clearValidation(form, config) {
         input.setCustomValidity('')
         deleteError(input, errorItem, config.inputErrorClass, config.errorClass)
     })
+    toggleSubmitButton(inputs, submitButton, config.inactiveButtonClass)
 }
 
 // Показать ошибку
