@@ -1,5 +1,5 @@
 import '../pages/index.css'
-import { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard, switchLike } from './api.js'
+import { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard, switchLike, checkLinkOnImageType } from './api.js'
 import { createCard, deleteCardElement } from './card.js'
 import { openModal, closeModal } from './modal.js'
 import { enableValidation, clearValidation } from './validation.js'
@@ -125,12 +125,28 @@ function handleAvatarFormSubmit(evt) {
     const newAvatar = {avatar: profileEditAvatarInput.value}
     renderLoading(true, evt.submitter, 'Сохранение')
 
-    changeProfileImage(newAvatar)
-    .then((profileData) => {
-        profileImage.style.backgroundImage = `url(${profileData.avatar})`
-        closeModal(profileEditAvatarModal)
+    checkLinkOnImageType(profileEditAvatarInput.value)
+    .then(res => {
+        if (res) {
+            changeProfileImage(newAvatar)
+            .then(profileData => {
+                profileImage.style.backgroundImage = `url(${profileData.avatar})`
+                closeModal(profileEditAvatarModal)
+                const errorItem = profileEditAvatarForm.querySelector(`.${profileEditAvatarInput.id}-error`)
+                profileEditAvatarInput.classList.remove(validationConfig.inputErrorClass)
+                errorItem.classList.remove(validationConfig.errorClass)
+            })
+        } else {
+            throw new Error('Ссылка не ведет на изображение')
+        }
     })
-    .catch(err => console.error(`Упс, ошибочка загрузки аватара: ${err}`))
+    .catch(err => {
+        console.error(`Ошибка проверки ссылки аватара: ${err}`)
+        const errorItem = profileEditAvatarForm.querySelector(`.${profileEditAvatarInput.id}-error`)
+        profileEditAvatarInput.classList.add(validationConfig.inputErrorClass)
+        errorItem.classList.add(validationConfig.errorClass)
+        errorItem.textContent = 'Увы, эта ссылка не подойдет, попробуйте другую'
+    })
     .finally(() => renderLoading(false, evt.submitter))
 }
 
@@ -158,6 +174,20 @@ function handleNewCardFormSubmit(evt) {
     .finally(() => renderLoading(false, evt.submitter))
 }
 
+// Отправка формы подтверждения Удаления
+function handleConfirmDeleteFormSubmit(evt) {
+    evt.preventDefault()
+    renderLoading(true, evt.submitter, 'Удаление')
+
+    deleteCard(cardForDelete.cardId)
+    .then(() => {
+        deleteCardElement(cardForDelete.cardElement)
+        closeModal(confirmDeleteModal)
+    })
+    .catch(err => console.error("Ошибка удаления:", err))
+    .finally(() => renderLoading(false, evt.submitter))
+}
+
 // Открытие попапа картинки Карточки
 function openImgModal(name, link) {
     openModal(cardImagePopup)
@@ -181,7 +211,7 @@ function openConfirmDeleteModal(cardId, cardElement) {
 
 //------------------- СЛУШАТЕЛИ -------------------
 // Все кнопки закрытия модальных окон
-closeModalButtons.forEach((btn) => {
+closeModalButtons.forEach(btn => {
     const modal = btn.closest('.popup')
     btn.addEventListener('click', () => closeModal(modal))
 })
@@ -225,32 +255,24 @@ addNewCardForm.addEventListener('submit', handleNewCardFormSubmit)
 profileEditAvatarForm.addEventListener('submit', handleAvatarFormSubmit)
 
 // "Да" Удаление
-confirmDeleteForm.addEventListener('submit', (evt) => {
-    evt.preventDefault()
-    renderLoading(true, evt.submitter, 'Удаление')
+confirmDeleteForm.addEventListener('submit', handleConfirmDeleteFormSubmit)
 
-    deleteCard(cardForDelete.cardId)
-    .then(() => {
-        deleteCardElement(cardForDelete.cardElement)
-        closeModal(confirmDeleteModal)
-    })
-    .catch(err => console.error("Ошибка удаления:", err))
-    .finally(() => renderLoading(false, evt.submitter))
-})
 
+//-----------------------------------------------
 // Записываю оригинальный текст кнопок
 allPopupButtons.forEach(btn => {
     btn.dataset.originalText = btn.textContent
 })
 
 // Плавное открытие/закрытие всех модальных окон
-modals.forEach((modal) => {
+modals.forEach(modal => {
     modal.classList.add('popup_is-animated')
 })
 
-//-----------------------------------------------
 // Вызовы функций
 enableValidation(validationConfig)
+//-----------------------------------------------
+
 
 Promise.all([getInitialCards(), getCurrentUserData()])
     .then(([cards, userData]) => {

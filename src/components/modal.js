@@ -1,7 +1,7 @@
 export { openModal, closeModal }
 
 // Функция открытия модального окна
-const openModal = (modal) => {
+const openModal = modal => {
     modal.classList.add('popup_is-opened')
     modal.addEventListener('mousedown', closeModalByOverlayClick)
     document.addEventListener('keydown', closeModalByKey)
@@ -15,14 +15,14 @@ const closeModal = modal => {
 }
 
 // Функция-обработчик события клика по оверлею
-function closeModalByOverlayClick(evt) {
+const closeModalByOverlayClick = evt => {
     if (evt.target === evt.currentTarget) {
         closeModal(evt.currentTarget)
     }
 }
 
 // Функция-обработчик события нажатия кнопки "Esc"
-function closeModalByKey(evt) {
+const closeModalByKey = evt => {
     if (evt.key === 'Escape') {
         const modal = document.querySelector('.popup_is-opened')
         modal ? closeModal(modal) : false

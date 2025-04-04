@@ -1,4 +1,4 @@
-export { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard, switchLike }
+export { getCurrentUserData, getInitialCards, changeProfileData, changeProfileImage, postNewCard, deleteCard, switchLike, checkLinkOnImageType }
 
 //------------------- CONFIG -------------------
 const config = {
@@ -87,3 +87,19 @@ const switchLike = (cardId, likeStatus) => {
 }
 
 
+//------------------- HEAD -------------------
+// Аватар
+const checkLinkOnImageType = link => {
+    return fetch(link, {
+        method: 'HEAD',
+    })
+    .then(res => {
+        const linkType = res.headers.get('Content-Type')
+        if (res.ok && linkType && linkType.startsWith('image/')) {
+            return true
+        } else {
+            return false
+        }
+    })
+    .catch(err => console.error(`Ошибка проверки ссылки: ${err}`))
+}

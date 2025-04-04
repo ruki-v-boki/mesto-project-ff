@@ -34,10 +34,10 @@ function createCard(cardData, switchLike, openImgModal, openConfirmDeleteModal, 
                 cardLikesCounterElement.classList.remove('display-disabled')
             }
         })
-        .catch(err => console.error(`Упс, лайнуть не удалось: ${err}`))
+        .catch(err => console.error(`Упс, лайкнуть не удалось: ${err}`))
     })
 
-    cardImage.addEventListener('click', (evt) => {
+    cardImage.addEventListener('click', () => {
         openImgModal(cardData.name, cardData.link)
     })
 
