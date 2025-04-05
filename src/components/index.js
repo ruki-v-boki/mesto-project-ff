@@ -106,24 +106,22 @@ function renderLoading(isLoading, button, loadingText) {
 // Инициализация Страницы
 function initalizePage(getInitialCards, getCurrentUserData) {
     spinLoader(true, loaders, profileImage)
-    spinLoader(true, loaders, cardContainer)
     Promise.all([getInitialCards(), getCurrentUserData()])
-        .then(([cards, userData]) => {
-            cards.forEach(cardData => {
-                cardContainer.append(createCard(cardData,
-                                                switchLike,
-                                                openImgModal,
-                                                openConfirmDeleteModal,
-                                                userData._id
-                ))
-            })
-            updateProfile(userData)
+    .then(([cards, userData]) => {
+        cards.forEach(cardData => {
+            cardContainer.append(createCard(cardData,
+                                            switchLike,
+                                            openImgModal,
+                                            openConfirmDeleteModal,
+                                            userData._id
+            ))
         })
-        .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
-        .finally(() => {
-            spinLoader(false, loaders, profileImage)
-            spinLoader(false, loaders, cardContainer)
-        })
+        updateProfile(userData)
+    })
+    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+    .finally(() => {
+        spinLoader(false, loaders, profileImage)
+    })
 }
 
 // Профиль
