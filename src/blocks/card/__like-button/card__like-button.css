@@ -25,11 +25,6 @@
 }
 
 .card__likes-counter {
-  /* display: block; */
   font-size: 13px;
   margin-top: 3px;
-}
-
-.display-disabled {
-  display: none;
 }

@@ -5,6 +5,10 @@ import { openModal, closeModal } from './modal.js'
 import { enableValidation, clearValidation } from './validation.js'
 
 
+//------------------- ЛОАДЕР -------------------
+const loaders = document.querySelectorAll('.loader')
+
+
 //------------------- ПРОФИЛЬ -------------------
 const profileName = document.querySelector('.profile__title')
 const profileJob = document.querySelector('.profile__description')
@@ -82,7 +86,13 @@ const cardForDelete = {
 
 
 //------------------- ФУНКЦИИ -------------------
-// Лоадер
+// Лоадер страницы
+function spinLoader(isLoading, loaderElements, domElement) {
+    loaderElements.forEach(loader => loader.classList.toggle('display-disabled', !isLoading))
+    domElement.classList.toggle('display-disabled', isLoading)
+}
+
+// Лоадер кнопки
 function renderLoading(isLoading, button, loadingText) {
     if (isLoading) {
         button.classList.add('popup__button_loading')
@@ -91,6 +101,29 @@ function renderLoading(isLoading, button, loadingText) {
         button.classList.remove('popup__button_loading')
         button.textContent = button.dataset.originalText
     }
+}
+
+// Инициализация Страницы
+function initalizePage(getInitialCards, getCurrentUserData) {
+    spinLoader(true, loaders, profileImage)
+    spinLoader(true, loaders, cardContainer)
+    Promise.all([getInitialCards(), getCurrentUserData()])
+        .then(([cards, userData]) => {
+            cards.forEach(cardData => {
+                cardContainer.append(createCard(cardData,
+                                                switchLike,
+                                                openImgModal,
+                                                openConfirmDeleteModal,
+                                                userData._id
+                ))
+            })
+            updateProfile(userData)
+        })
+        .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))
+        .finally(() => {
+            spinLoader(false, loaders, profileImage)
+            spinLoader(false, loaders, cardContainer)
+        })
 }
 
 // Профиль
@@ -269,21 +302,8 @@ modals.forEach(modal => {
     modal.classList.add('popup_is-animated')
 })
 
+
+//------------------- ИНИЦИАЛИЗАЦИЯ -------------------
 // Вызовы функций
+initalizePage(getInitialCards, getCurrentUserData)
 enableValidation(validationConfig)
-//-----------------------------------------------
-
-
-Promise.all([getInitialCards(), getCurrentUserData()])
-    .then(([cards, userData]) => {
-        cards.forEach(cardData => {
-            cardContainer.append(createCard(cardData,
-                                            switchLike,
-                                            openImgModal,
-                                            openConfirmDeleteModal,
-                                            userData._id
-            ))
-        })
-        updateProfile(userData)
-    })
-    .catch(err => console.error(`Упс, ошибочка вышла: ${err}`))

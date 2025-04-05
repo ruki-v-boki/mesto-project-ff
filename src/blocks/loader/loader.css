@@ -1,0 +1,23 @@
+.loader {
+  display: flex;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+  border: 5px solid #FFF;
+  border-radius: 50%;
+  border-bottom-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+.loader_visible {
+  visibility: visible;
+}
+
+@keyframes spin {
+  0% {
+	transform: rotate(0deg);
+  }
+  100% {
+	transform: rotate(360deg);
+  }
+}
