@@ -154,6 +154,7 @@ function handleProfileFormSubmit(evt) {
 function handleAvatarFormSubmit(evt) {
     evt.preventDefault()
     const newAvatar = {avatar: profileEditAvatarInput.value}
+    const errorItem = profileEditAvatarForm.querySelector(`.${profileEditAvatarInput.id}-error`)
     renderLoading(true, evt.submitter, 'Сохранение')
 
     checkLinkOnImageType(profileEditAvatarInput.value)
@@ -163,7 +164,6 @@ function handleAvatarFormSubmit(evt) {
             .then(profileData => {
                 profileImage.style.backgroundImage = `url(${profileData.avatar})`
                 closeModal(profileEditAvatarModal)
-                const errorItem = profileEditAvatarForm.querySelector(`.${profileEditAvatarInput.id}-error`)
                 profileEditAvatarInput.classList.remove(validationConfig.inputErrorClass)
                 errorItem.classList.remove(validationConfig.errorClass)
             })
@@ -173,7 +173,6 @@ function handleAvatarFormSubmit(evt) {
     })
     .catch(err => {
         console.error(`Ошибка проверки ссылки аватара: ${err}`)
-        const errorItem = profileEditAvatarForm.querySelector(`.${profileEditAvatarInput.id}-error`)
         profileEditAvatarInput.classList.add(validationConfig.inputErrorClass)
         errorItem.classList.add(validationConfig.errorClass)
         errorItem.textContent = 'Увы, эта ссылка не подойдет, попробуйте другую'
