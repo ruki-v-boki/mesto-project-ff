@@ -1,10 +1,13 @@
 export { openModal, closeModal }
 
+let lastFocusedElement
+
 // Функция открытия модального окна
 const openModal = modal => {
     modal.classList.add('popup_is-opened')
     modal.addEventListener('mousedown', closeModalByOverlayClick)
     document.addEventListener('keydown', closeModalByKey)
+    lastFocusedElement = document.activeElement
 }
 
 // Функция закрытия модального окна
@@ -12,6 +15,7 @@ const closeModal = modal => {
     modal.classList.remove('popup_is-opened')
     modal.removeEventListener('mousedown', closeModalByOverlayClick)
     document.removeEventListener('keydown', closeModalByKey)
+    if (lastFocusedElement) lastFocusedElement.focus()
 }
 
 // Функция-обработчик события клика по оверлею
@@ -25,6 +29,6 @@ const closeModalByOverlayClick = evt => {
 const closeModalByKey = evt => {
     if (evt.key === 'Escape') {
         const modal = document.querySelector('.popup_is-opened')
-        modal ? closeModal(modal) : false
+        if (modal) closeModal(modal)
     }
 }

@@ -1,7 +1,7 @@
 export { createCard, deleteCardElement }
 
 // Функция создания карточки
-function createCard(cardData, switchLike, openImgModal, openConfirmDeleteModal, currentUserId) {
+function createCard(cardData, switchLike, openImageModal, openConfirmDeleteModal, currentUserId) {
     const cardTemplate = document.querySelector('#card-template').content
     const card = cardTemplate.querySelector('.card').cloneNode(true)
     const cardImage = card.querySelector('.card__image')
@@ -38,7 +38,7 @@ function createCard(cardData, switchLike, openImgModal, openConfirmDeleteModal, 
     })
 
     cardImage.addEventListener('click', () => {
-        openImgModal(cardData.name, cardData.link)
+        openImageModal(cardData.name, cardData.link)
     })
 
     cardDeleteButton.addEventListener('click', () => {

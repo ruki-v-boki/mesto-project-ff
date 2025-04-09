@@ -104,14 +104,14 @@ function renderLoading(isLoading, button, loadingText) {
 }
 
 // Инициализация Страницы
-function initalizePage(getInitialCards, getCurrentUserData) {
+function initializePage(getInitialCards, getCurrentUserData) {
     spinLoader(true, loaders, profileImage)
     Promise.all([getInitialCards(), getCurrentUserData()])
     .then(([cards, userData]) => {
         cards.forEach(cardData => {
             cardContainer.append(createCard(cardData,
                                             switchLike,
-                                            openImgModal,
+                                            openImageModal,
                                             openConfirmDeleteModal,
                                             userData._id
             ))
@@ -193,7 +193,7 @@ function handleNewCardFormSubmit(evt) {
     .then(newCardData => {
         cardContainer.prepend(createCard(newCardData,
                                         switchLike,
-                                        openImgModal,
+                                        openImageModal,
                                         openConfirmDeleteModal,
                                         newCardData.owner._id
         ))
@@ -219,7 +219,7 @@ function handleConfirmDeleteFormSubmit(evt) {
 }
 
 // Открытие попапа картинки Карточки
-function openImgModal(name, link) {
+function openImageModal(name, link) {
     openModal(cardImagePopup)
     popupImage.alt = name
     popupCaption.textContent = name
@@ -302,5 +302,5 @@ modals.forEach(modal => {
 
 //------------------- ИНИЦИАЛИЗАЦИЯ -------------------
 // Вызовы функций
-initalizePage(getInitialCards, getCurrentUserData)
+initializePage(getInitialCards, getCurrentUserData)
 enableValidation(validationConfig)
